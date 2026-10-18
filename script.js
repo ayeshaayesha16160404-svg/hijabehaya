@@ -155,7 +155,7 @@ function orderOnWhatsApp() {
         return;
     }
 
-    let message = "Assalam o Alaikum!%0A%0AI want to order from *Noor Hijab Store*:%0A%0A";
+    let message = "Assalam o Alaikum!%0A%0AI want to order from *hijab e haya*:%0A%0A";
     
     cart.forEach(item => {
         message += `• ${item.name}%0A  Qty: ${item.quantity} × Rs.${item.price}%0A%0A`;
@@ -166,7 +166,7 @@ function orderOnWhatsApp() {
     message += `Name: %0AAddress: %0APhone: %0A%0APlease confirm my order. JazakAllah!`;
 
     // ←←← Yahan apna WhatsApp number daalo (92 ke sath)
-    const phone = "923001234567";
+    const phone = "923067226410";
     window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
 }
 
