@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noor | Luxury Hijab Store</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Floating particles background -->
+    <div class="particles"></div>
+
+    <header>
+        <div class="logo">Noor<span>.</span></div>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#products">Collections</a>
+            <a href="#">About</a>
+        </nav>
+        <div class="cart-btn" onclick="toggleCart()">
+            <span>🛒</span>
+            <span id="cart-count">0</span>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Elegance<br>in Every Fold</h1>
+            <p>Premium Hijabs crafted with love & grace</p>
+            <a href="#products" class="btn">Explore Collection</a>
+        </div>
+        <div class="hero-3d">
+            <div class="floating-card"></div>
+        </div>
+    </section>
+
+    <!-- Products -->
+    <section class="products-section" id="products">
+        <h2 class="section-title">Our Collection</h2>
+        <div class="products-grid" id="products-grid">
+            <!-- Products will be injected by JS -->
+        </div>
+    </section>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cart">
+        <div class="cart-header">
+            <h3>Your Bag</h3>
+            <button onclick="toggleCart()">✕</button>
+        </div>
+        <div id="cart-items"></div>
+        <div class="cart-footer">
+            <div class="total">Total: <span id="total">Rs. 0</span></div>
+            <button class="whatsapp-btn" onclick="orderOnWhatsApp()">
+                Order on WhatsApp
+            </button>
+            <button class="clear-btn" onclick="clearCart()">Clear Cart</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="toggleCart()"></div>
+
+    <footer>
+        <p>© 2026 Noor Luxury Hijabs — Made with ❤️</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
