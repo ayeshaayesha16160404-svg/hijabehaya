@@ -216,29 +216,28 @@ function toggleCart() {
 }
 
 // ====================== ORDER (Sheet + WhatsApp) ======================
-async function orderOnWhatsApp() {
+
+
+  //new order on whastapp
+  function orderOnWhatsApp() {
   if (cart.length === 0) {
     alert("Your bag is empty!");
     return;
   }
 
-  // Customer details
-  const name = prompt("Apna Name likhein:");
-  if (!name) return;
+  let message = "Assalam o Alaikum!%0A%0A*Hijab-e-Haya* se order:%0A%0A";
 
-  const phone = prompt("Apna Phone Number likhein:");
-  if (!phone) return;
-
-  const address = prompt("Apna Complete Address likhein:");
-  if (!address) return;
-
-  // Products text
-  let productsText = "";
   cart.forEach(item => {
-    productsText += `${item.name} (Qty: ${item.quantity}) | `;
+    message += `• ${item.name}%0A  Qty: ${item.quantity} × Rs.${item.price}%0A%0A`;
   });
 
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  message += `*Total: Rs. ${total.toLocaleString()}*%0A%0AName: %0APhone: %0AAddress: `;
+
+  // Yahan apna number daalo
+  const phone = "923707695136";
+  window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+}
 
   // 1. Google Sheet mein save karo
   try {
