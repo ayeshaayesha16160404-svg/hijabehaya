@@ -156,7 +156,7 @@ function addToCart(id) {
 
   saveCart();
   updateCartUI();
-  alert(`${product.name} bag mein add ho gaya!`);
+  alert(`${product.name} added to bag !`);
 }
 
 function saveCart() {
@@ -218,24 +218,21 @@ function toggleCart() {
 // ====================== ORDER (Sheet + WhatsApp) ======================
 
 
-  //new order on whastapp
 function orderOnWhatsApp() {
   if (cart.length === 0) {
     alert("Your bag is empty!");
     return;
   }
 
-  // Customer details
-  const name = prompt("Enter your name:");
+  const name = prompt("Name :");
   if (!name) return;
 
-  const phone = prompt("Phone Number :");
+  const phone = prompt(" Phone Number :");
   if (!phone) return;
 
   const address = prompt(" Complete Address :");
   if (!address) return;
 
-  // Order details
   let productsText = "";
   cart.forEach(item => {
     productsText += `• ${item.name} (Qty: ${item.quantity}) - Rs.${item.price}\n`;
@@ -243,9 +240,7 @@ function orderOnWhatsApp() {
 
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  // Message
   const message = `Assalam o Alaikum!
-
 *Hijab-e-Haya* se naya order:
 
 *Name:* ${name}
@@ -256,14 +251,13 @@ function orderOnWhatsApp() {
 ${productsText}
 *Total: Rs. ${total.toLocaleString()}*
 
-Please confirm my order. JazakAllah!`;
+Please confirm. JazakAllah!`;
 
-  // Google Sheet mein save (optional)
+  // Google Sheet mein save
   try {
     fetch(ORDERS_API, {
       method: "POST",
       mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: name,
         phone: phone,
@@ -274,27 +268,15 @@ Please confirm my order. JazakAllah!`;
     });
   } catch (e) {}
 
-  // ========== SEEDHA WHATSAPP APP KHOLNE KE LIYE ==========
-  const whatsappNumber = "923707695136"; // ← Apna number yahan
-  const encodedMessage = encodeURIComponent(message);
+  // ========== MOBILE PE SEEDHA WHATSAPP APP ==========
+  const number = "923707695136"; // ← Apna number yahan daalo (92 se start)
+  const text = encodeURIComponent(message);
 
-  // Yeh method mobile pe seedha WhatsApp App kholta hai
-  const appUrl = `whatsapp://send?phone=${whatsappNumber}&text=${encodedMessage}`;
-  const webUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+  // Yeh mobile pe seedha WhatsApp App kholta hai
+  window.location.href = `whatsapp://send?phone=${number}&text=${text}`;
 
-  // Pehle App try karo, warna browser
-  window.location.href = appUrl;
-
-  // Backup (agar app na khule)
-  setTimeout(() => {
-    window.open(webUrl, "_blank");
-  }, 1500);
-
-  // Cart clear
   clearCart();
 }
-  // Cart clear
- 
 
 // ====================== INIT ======================
 loadProducts();
