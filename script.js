@@ -219,29 +219,48 @@ function toggleCart() {
 
 
   //new order on whastapp
-  function orderOnWhatsApp() {
+function orderOnWhatsApp() {
   if (cart.length === 0) {
     alert("Your bag is empty!");
     return;
   }
 
-  let message = "Assalam o Alaikum!%0A%0A*Hijab-e-Haya* se order:%0A%0A";
+  // Customer details
+  const name = prompt("Enter your name:");
+  if (!name) return;
 
+  const phone = prompt("Phone Number :");
+  if (!phone) return;
+
+  const address = prompt(" Complete Address :");
+  if (!address) return;
+
+  // Order details
+  let productsText = "";
   cart.forEach(item => {
-    message += `• ${item.name}%0A  Qty: ${item.quantity} × Rs.${item.price}%0A%0A`;
+    productsText += `• ${item.name} (Qty: ${item.quantity}) - Rs.${item.price}\n`;
   });
 
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  message += `*Total: Rs. ${total.toLocaleString()}*%0A%0AName: %0APhone: %0AAddress: `;
 
-  // Yahan apna number daalo
-  const phone = "923707695136";
-  window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-}
+  // Message
+  const message = `Assalam o Alaikum!
 
-  // 1. Google Sheet mein save karo
+*Hijab-e-Haya* se naya order:
+
+*Name:* ${name}
+*Phone:* ${phone}
+*Address:* ${address}
+
+*Order:*
+${productsText}
+*Total: Rs. ${total.toLocaleString()}*
+
+Please confirm my order. JazakAllah!`;
+
+  // Google Sheet mein save (optional)
   try {
-    await fetch(ORDERS_API, {
+    fetch(ORDERS_API, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "application/json" },
@@ -253,29 +272,29 @@ function toggleCart() {
         total: total
       })
     });
-  } catch (e) {
-    console.log("Sheet error", e);
-  }
+  } catch (e) {}
 
-  // 2. WhatsApp message
-  let message = `Assalam o Alaikum!%0A%0A*Hijab-e-Haya* se order:%0A%0A`;
-  message += `*Name:* ${name}%0A`;
-  message += `*Phone:* ${phone}%0A`;
-  message += `*Address:* ${address}%0A%0A`;
-  message += `*Order:*%0A`;
+  // ========== SEEDHA WHATSAPP APP KHOLNE KE LIYE ==========
+  const whatsappNumber = "923707695136"; // ← Apna number yahan
+  const encodedMessage = encodeURIComponent(message);
 
-  cart.forEach(item => {
-    message += `• ${item.name}%0A  Qty: ${item.quantity} × Rs.${item.price}%0A%0A`;
-  });
+  // Yeh method mobile pe seedha WhatsApp App kholta hai
+  const appUrl = `whatsapp://send?phone=${whatsappNumber}&text=${encodedMessage}`;
+  const webUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
-  message += `*Total: Rs. ${total.toLocaleString()}*%0A%0APlease confirm my order. JazakAllah!`;
+  // Pehle App try karo, warna browser
+  window.location.href = appUrl;
 
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
+  // Backup (agar app na khule)
+  setTimeout(() => {
+    window.open(webUrl, "_blank");
+  }, 1500);
 
   // Cart clear
   clearCart();
-  alert("Order place ho gaya! WhatsApp check karein.");
 }
+  // Cart clear
+ 
 
 // ====================== INIT ======================
 loadProducts();
