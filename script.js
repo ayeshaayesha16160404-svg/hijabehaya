@@ -1,7 +1,7 @@
 // ====================== CONFIG ======================
 // Yahan apni URLs daalo
 const PRODUCTS_API = "https://script.google.com/macros/s/AKfycbypksr8TvMRX9TA2Dnxw6EhySvWgZMknrbXOLBx-pQJCn2pAUWv6BNbk0sjH2rqP9DT3g/exec";
-const ORDERS_API   = "https://script.google.com/macros/s/AKfycbxYTCOZoPX7TKTlJOC5VJlLMNk7slA1y57XdcZ8hablaSIondnTN4961P7RfCnD40gC/exec";
+const ORDERS_API   = "https://script.google.com/macros/s/AKfycbzeDWzb9MjDeXjwCIqMO-isuHYAOfNHEtRm6jXosJ9Azgx9VnYZ4f4fUi8kBy_hH3W0/exec";
 const WHATSAPP_NUMBER = "923707695136"; // Apna number (92 ke sath)
 
 // ====================== GLOBAL ======================
