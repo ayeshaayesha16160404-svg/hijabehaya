@@ -2,9 +2,9 @@ const products = [
     // Hijabs
     {
         id: 1,
-        name: "Soft Chiffon Hijab",
-        price: 1299,
-        oldPrice: 1599,
+        name: "Soft Chiffon Hijabs",
+        price: 499,
+        oldPrice: 699,
         category: "hijab",
         image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=700&q=80",
         desc: "Lightweight breathable chiffon with elegant drape. Perfect for daily wear."
