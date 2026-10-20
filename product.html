@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
     <div class="announcement">
         Flat Rs.300 Shipping on All Orders • No Minimum Purchase
     </div>
@@ -31,7 +30,7 @@
         </div>
     </section>
 
-    <!-- Cart same -->
+    <!-- Cart -->
     <div class="cart-sidebar" id="cart">
         <div class="cart-header">
             <h3>Your Bag</h3>
@@ -47,49 +46,43 @@
     <div class="overlay" id="overlay" onclick="toggleCart()"></div>
 
     <script src="script.js"></script>
-    <!-- Custom Order Modal -->
-<!-- ========== ORDER MODAL ========== -->
-<div class="order-modal-overlay" id="orderModal">
-  <div class="order-modal">
-    <button type="button" class="modal-close" onclick="closeOrderModal()">×</button>
 
-    <div class="modal-header">
-      <p class="modal-brand">Hijab-e-Haya</p>
-      <h3>Complete Your Order</h3>
-      <p class="modal-sub">Elegant • Modest • Delivered with care</p>
+    <!-- ========== ORDER MODAL ========== -->
+    <div class="order-modal-overlay" id="orderModal">
+        <div class="order-modal">
+            <button type="button" class="modal-close" onclick="closeOrderModal()">×</button>
+            <div class="modal-header">
+                <p class="modal-brand">Hijab-e-Haya</p>
+                <h3>Complete Your Order</h3>
+                <p class="modal-sub">Elegant • Modest • Delivered with care</p>
+            </div>
+            <div class="pay-info">
+                <div class="pay-info-title">Payment & Delivery</div>
+                <p>• <strong>Cash on Delivery</strong> products ke liye available hai</p>
+                <p>• <strong>Delivery charges advance</strong> mein dene honge</p>
+                <p class="pay-note">Order confirm hone ke baad delivery charges ka method bata diya jayega (JazzCash / EasyPaisa / Bank).</p>
+            </div>
+            <div class="order-modal-fields">
+                <label>Full Name</label>
+                <input type="text" id="orderName" placeholder="Aapka poora naam" autocomplete="name">
+                <label>Phone / WhatsApp</label>
+                <input type="tel" id="orderPhone" placeholder="03XX-XXXXXXX" autocomplete="tel">
+                <label>City</label>
+                <input type="text" id="orderCity" placeholder="Lahore, Karachi, Islamabad..." autocomplete="address-level2">
+                <label>Complete Address</label>
+                <textarea id="orderAddress" placeholder="Area, street, house / building"></textarea>
+                <label>Delivery charges</label>
+                <select id="orderDelivery">
+                    <option value="">Select option</option>
+                    <option value="Advance — ready to pay delivery charges">Advance — main delivery charges de dungi/dunga</option>
+                    <option value="Need delivery charges details first">Pehle delivery charges ki detail chahiye</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="modal-btn cancel" onclick="closeOrderModal()">Cancel</button>
+                <button type="button" class="modal-btn confirm" onclick="submitOrder()">Place Order</button>
+            </div>
+        </div>
     </div>
-
-    <div class="pay-info">
-      <div class="pay-info-title">Payment & Delivery</div>
-      <p>• <strong>Cash on Delivery</strong> products ke liye available hai</p>
-      <p>• <strong>Delivery charges advance</strong> mein dene honge</p>
-      <p class="pay-note">Order confirm hone ke baad delivery charges ka method bata diya jayega (JazzCash / EasyPaisa / Bank).</p>
-    </div>
-
-    <label>Full Name</label>
-    <input type="text" id="orderName" placeholder="Aapka poora naam" autocomplete="name">
-
-    <label>Phone / WhatsApp</label>
-    <input type="tel" id="orderPhone" placeholder="03XX-XXXXXXX" autocomplete="tel">
-
-    <label>City</label>
-    <input type="text" id="orderCity" placeholder="Lahore, Karachi, Islamabad..." autocomplete="address-level2">
-
-    <label>Complete Address</label>
-    <textarea id="orderAddress" placeholder="Area, street, house / building"></textarea>
-
-    <label>Delivery charges</label>
-    <select id="orderDelivery">
-      <option value="">Select option</option>
-      <option value="Advance — ready to pay delivery charges">Advance — main delivery charges de dungi/dunga</option>
-      <option value="Need delivery charges details first">Pehle delivery charges ki detail chahiye</option>
-    </select>
-
-    <div class="modal-actions">
-      <button type="button" class="modal-btn cancel" onclick="closeOrderModal()">Cancel</button>
-      <button type="button" class="modal-btn confirm" onclick="submitOrder()">Place Order</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
