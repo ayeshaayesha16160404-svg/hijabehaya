@@ -70,7 +70,7 @@
 
     <!-- Why Choose -->
     <section class="why-us">
-        <h2>Why Choose Noor?</h2>
+        <h2>Why Choose Hijab-e-Haya?</h2>
         <div class="why-grid">
             <div class="why-item">
                 <h4>Premium Quality</h4>
@@ -150,6 +150,36 @@
       <button type="button" class="modal-btn cancel" onclick="closeOrderModal()">Cancel</button>
       <button type="button" class="modal-btn confirm" onclick="submitOrder()">Place Order</button>
     </div>
+  </div>
+</div>
+    <div class="order-modal">
+  <button type="button" class="modal-close" onclick="closeOrderModal()">×</button>
+
+  <div class="modal-header">...</div>
+  <div class="pay-info">...</div>
+
+  <!-- sirf yeh scroll hoga agar zaroorat pade -->
+  <div class="order-modal-fields">
+    <label>Full Name</label>
+    <input ... id="orderName">
+
+    <label>Phone / WhatsApp</label>
+    <input ... id="orderPhone">
+
+    <label>City</label>
+    <input ... id="orderCity">
+
+    <label>Complete Address</label>
+    <textarea ... id="orderAddress"></textarea>
+
+    <label>Delivery charges</label>
+    <select id="orderDelivery">...</select>
+  </div>
+
+  <!-- yeh hamesha dikhega -->
+  <div class="modal-actions">
+    <button class="modal-btn cancel" onclick="closeOrderModal()">Cancel</button>
+    <button class="modal-btn confirm" onclick="submitOrder()">Place Order</button>
   </div>
 </div>
 </body>
