@@ -18,6 +18,7 @@ function showToast(msg, withCartBtn) {
     document.body.appendChild(t);
   }
 
+  // Clear previous timer
   if (toastTimer) {
     clearTimeout(toastTimer);
     toastTimer = null;
@@ -35,6 +36,7 @@ function showToast(msg, withCartBtn) {
   t.innerHTML = html;
   t.classList.add("show");
 
+  // Longer time when action button is present
   var duration = withCartBtn ? 4500 : 2500;
   toastTimer = setTimeout(function () {
     hideToast();
@@ -80,6 +82,64 @@ async function loadProducts() {
   }
 }
 
+// ====================== HELPER: description → bullets ======================
+function descToBullets(desc, maxPoints) {
+  if (!desc || typeof desc !== "string") return "";
+  maxPoints = maxPoints || 3;
+
+  // Split by newlines, bullet chars, or " - " / "•"
+  var points = desc
+    .split(/[\n\r]+|•|–|—|\s[-–]\s/)
+    .map(function (s) {
+      return s.replace(/^[\s•\-–—*]+/, "").trim();
+    })
+    .filter(function (s) {
+      return s.length > 2;
+    });
+
+  if (points.length === 0) {
+    // plain paragraph — take first sentence or short text
+    var short = desc.trim();
+    if (short.length > 90) short = short.slice(0, 87) + "...";
+    return '<ul class="card-desc"><li>' + short + "</li></ul>";
+  }
+
+  var limited = points.slice(0, maxPoints);
+  var html = '<ul class="card-desc">';
+  limited.forEach(function (p) {
+    var text = p.length > 70 ? p.slice(0, 67) + "..." : p;
+    html += "<li>" + text + "</li>";
+  });
+  if (points.length > maxPoints) {
+    html += '<li class="more-dots">...</li>';
+  }
+  html += "</ul>";
+  return html;
+}
+
+function descToFullBullets(desc) {
+  if (!desc || typeof desc !== "string") return "";
+  var points = desc
+    .split(/[\n\r]+|•|–|—|\s[-–]\s/)
+    .map(function (s) {
+      return s.replace(/^[\s•\-–—*]+/, "").trim();
+    })
+    .filter(function (s) {
+      return s.length > 2;
+    });
+
+  if (points.length === 0) {
+    return '<p class="desc">' + desc + "</p>";
+  }
+
+  var html = '<ul class="detail-desc">';
+  points.forEach(function (p) {
+    html += "<li>" + p + "</li>";
+  });
+  html += "</ul>";
+  return html;
+}
+
 // ====================== DISPLAY PRODUCTS ======================
 function displayProducts(filter) {
   filter = filter || "all";
@@ -121,6 +181,7 @@ function displayProducts(filter) {
         Number(product.oldPrice).toLocaleString() +
         "</span>"
       : "";
+    const bulletsHtml = descToBullets(product.desc, 3);
 
     grid.innerHTML +=
       '<div class="product-card">' +
@@ -145,6 +206,7 @@ function displayProducts(filter) {
       "</span>" +
       oldPriceHtml +
       "</div>" +
+      bulletsHtml +
       "</div>" +
       "</a>" +
       '<div style="padding:0 18px 18px;text-align:center;">' +
@@ -212,6 +274,8 @@ async function loadProductPage() {
       "', this)\" alt=\"thumb\">";
   });
 
+  const descHtml = descToFullBullets(product.desc || "");
+
   container.innerHTML =
     "<div>" +
     '<a href="index.html" class="back-link">← Back to Collection</a>' +
@@ -235,9 +299,7 @@ async function loadProductPage() {
     " " +
     oldPriceHtml +
     "</div>" +
-    '<p class="desc">' +
-    (product.desc || "") +
-    "</p>" +
+    descHtml +
     '<button class="add-btn-large" onclick="addToCart(' +
     product.id +
     ')">Add to Bag</button>' +
@@ -271,6 +333,7 @@ function addToCart(id) {
 
   saveCart();
   updateCartUI();
+  // Larger toast + "View Bag / Cart" button
   showToast(product.name + " bag mein add ho gaya ✓", true);
 }
 
@@ -482,7 +545,7 @@ document.addEventListener("click", function (e) {
   if (modal && e.target === modal) closeOrderModal();
 });
 
-// ====================== INITi ======================
+// ====================== INIT ======================
 loadProducts();
 loadProductPage();
 updateCartUI();
