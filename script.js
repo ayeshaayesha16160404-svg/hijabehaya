@@ -216,9 +216,8 @@ function toggleCart() {
 }
 
 // ====================== ORDER (Sheet + WhatsApp) ======================
-
-
-function orderOnWhatsApp() {
+// ====================== ORDER (Sheet + WhatsApp) ======================
+async function orderOnWhatsApp() {
   if (cart.length === 0) {
     alert("Your bag is empty!");
     return;
@@ -227,53 +226,56 @@ function orderOnWhatsApp() {
   const name = prompt("Name :");
   if (!name) return;
 
-  const phone = prompt(" Phone Number :");
+  const phone = prompt("Phone Number :");
   if (!phone) return;
 
-  const address = prompt(" Complete Address :");
+  const address = prompt("Complete Address :");
   if (!address) return;
 
   let productsText = "";
   cart.forEach(item => {
-    productsText += `• ${item.name} (Qty: ${item.quantity}) - Rs.${item.price}\n`;
+    productsText += item.name + " (Qty: " + item.quantity + ") - Rs." + item.price + " | ";
   });
 
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  const message = `Assalam o Alaikum!
-*Hijab-e-Haya* se naya order:
+  const message =
+    "Assalam o Alaikum!\n\n" +
+    "*Hijab-e-Haya* se naya order:\n\n" +
+    "*Name:* " + name + "\n" +
+    "*Phone:* " + phone + "\n" +
+    "*Address:* " + address + "\n\n" +
+    "*Order:*\n" + productsText + "\n" +
+    "*Total: Rs. " + total.toLocaleString() + "*\n\n" +
+    "Please confirm. JazakAllah!";
 
-*Name:* ${name}
-*Phone:* ${phone}
-*Address:* ${address}
+  // 1) PEHLE Sheet mein save (wait karo)
+  const sheetUrl =
+    ORDERS_API +
+    "?name=" + encodeURIComponent(name) +
+    "&phone=" + encodeURIComponent(phone) +
+    "&address=" + encodeURIComponent(address) +
+    "&products=" + encodeURIComponent(productsText) +
+    "&total=" + encodeURIComponent(total);
 
-*Order:*
-${productsText}
-*Total: Rs. ${total.toLocaleString()}*
+  try {
+    await fetch(sheetUrl, { mode: "no-cors" });
+  } catch (e) {}
 
-Please confirm. JazakAllah!`;
+  // thoda wait taake request complete ho jaye
+  await new Promise(function (resolve) {
+    setTimeout(resolve, 800);
+  });
 
-  // Google Sheet mein save
- //
-  // Google Sheet save
-const sheetUrl = ORDERS_API + 
-  "?name=" + encodeURIComponent(name) +
-  "&phone=" + encodeURIComponent(phone) +
-  "&address=" + encodeURIComponent(address) +
-  "&products=" + encodeURIComponent(productsText) +
-  "&total=" + encodeURIComponent(total);
-
-fetch(sheetUrl).catch(function(){});
-
-  // ========== MOBILE PE SEEDHA WHATSAPP APP ==========
-  const number = "923707695136"; // ← Apna number yahan daalo (92 se start)
-  const text = encodeURIComponent(message);
-
-  // Yeh mobile pe seedha WhatsApp App kholta hai
-  window.location.href = `whatsapp://send?phone=${number}&text=${text}`;
+  // 2) Phir WhatsApp (mobile pe App khulegi)
+  const number = "923707695136";
+  const waUrl = "https://wa.me/" + number + "?text=" + encodeURIComponent(message);
 
   clearCart();
+  window.location.href = waUrl;
 }
+
+
 
 // ====================== INIT ======================
 loadProducts();
