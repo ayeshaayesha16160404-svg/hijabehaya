@@ -107,5 +107,28 @@
     </footer>
 
     <script src="script.js"></script>
+
+    <!-- Custom Order Modal -->
+<div class="order-modal-overlay" id="orderModal">
+    <div class="order-modal">
+        <button class="modal-close" onclick="closeOrderModal()">×</button>
+        <h3>Place Your Order</h3>
+        <p class="modal-sub">Hijab-e-Haya • Elegant & Modest</p>
+
+        <label>Full Name</label>
+        <input type="text" id="orderName" placeholder="Your name">
+
+        <label>Phone Number</label>
+        <input type="tel" id="orderPhone" placeholder="03XX-XXXXXXX">
+
+        <label>Complete Address</label>
+        <textarea id="orderAddress" placeholder="City, area, full address"></textarea>
+
+        <div class="modal-actions">
+            <button class="modal-btn cancel" onclick="closeOrderModal()">Cancel</button>
+            <button class="modal-btn confirm" onclick="submitOrder()">Confirm Order</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
