@@ -6,9 +6,10 @@ const WHATSAPP_NUMBER = "923707695136";
 // ====================== GLOBAL ======================
 let products = [];
 let cart = JSON.parse(localStorage.getItem("haya_cart")) || [];
+let toastTimer = null;
 
-// ====================== TOAST (alert ki jagah) ======================
-function showToast(msg) {
+// ====================== TOAST (larger + action button) ======================
+function showToast(msg, withCartBtn) {
   var t = document.getElementById("toastMsg");
   if (!t) {
     t = document.createElement("div");
@@ -16,11 +17,47 @@ function showToast(msg) {
     t.className = "toast";
     document.body.appendChild(t);
   }
-  t.textContent = msg;
+
+  if (toastTimer) {
+    clearTimeout(toastTimer);
+    toastTimer = null;
+  }
+
+  var html = '<div class="toast-msg">' + msg + "</div>";
+  if (withCartBtn) {
+    html +=
+      '<div class="toast-actions">' +
+      '<button type="button" class="toast-btn" onclick="openCartFromToast()">View Bag / Cart</button>' +
+      '<button type="button" class="toast-btn secondary" onclick="hideToast()">Close</button>' +
+      "</div>";
+  }
+
+  t.innerHTML = html;
   t.classList.add("show");
-  setTimeout(function () {
-    t.classList.remove("show");
-  }, 2500);
+
+  var duration = withCartBtn ? 4500 : 2500;
+  toastTimer = setTimeout(function () {
+    hideToast();
+  }, duration);
+}
+
+function hideToast() {
+  var t = document.getElementById("toastMsg");
+  if (t) t.classList.remove("show");
+  if (toastTimer) {
+    clearTimeout(toastTimer);
+    toastTimer = null;
+  }
+}
+
+function openCartFromToast() {
+  hideToast();
+  var cartEl = document.getElementById("cart");
+  var overlay = document.getElementById("overlay");
+  if (cartEl && !cartEl.classList.contains("active")) {
+    cartEl.classList.add("active");
+    if (overlay) overlay.classList.add("active");
+  }
 }
 
 // ====================== LOAD PRODUCTS ======================
@@ -60,12 +97,13 @@ function displayProducts(filter) {
   });
 
   const filtered =
-    filter === "all" ? products : products.filter(function (p) {
-      return p.category === filter;
-    });
+    filter === "all"
+      ? products
+      : products.filter(function (p) {
+          return p.category === filter;
+        });
 
   grid.innerHTML = "";
-
   if (filtered.length === 0) {
     grid.innerHTML =
       '<p style="text-align:center;grid-column:1/-1;">No products found</p>';
@@ -233,7 +271,7 @@ function addToCart(id) {
 
   saveCart();
   updateCartUI();
-  showToast(product.name + " added to bag");
+  showToast(product.name + " bag mein add ho gaya ✓", true);
 }
 
 function saveCart() {
@@ -258,8 +296,7 @@ function updateCartUI() {
   cart.forEach(function (item) {
     total += item.price * item.quantity;
     count += item.quantity;
-    const img =
-      item.images && item.images[0] ? item.images[0] : "";
+    const img = item.images && item.images[0] ? item.images[0] : "";
 
     cartItems.innerHTML +=
       '<div class="cart-item">' +
@@ -439,13 +476,13 @@ async function submitOrder() {
   }, 600);
 }
 
-// Modal overlay click
+// Modal overlay click to close
 document.addEventListener("click", function (e) {
   var modal = document.getElementById("orderModal");
   if (modal && e.target === modal) closeOrderModal();
 });
 
-// ====================== INIT ======================
+// ====================== INITi ======================
 loadProducts();
 loadProductPage();
 updateCartUI();
