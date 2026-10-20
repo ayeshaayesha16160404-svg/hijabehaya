@@ -860,3 +860,207 @@ footer {
         transform: translateY(0) scale(1);
     }
 }
+/* ========== SUBTLE 3D FLOAT + ROTATE ON IMAGES ========== */
+@keyframes floatTilt {
+    0%   { transform: scale(1) rotate(0deg); }
+    25%  { transform: scale(1.03) rotate(1.2deg); }
+    50%  { transform: scale(1.05) rotate(0deg); }
+    75%  { transform: scale(1.03) rotate(-1.2deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes cardFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+}
+
+.product-image img {
+    animation: floatTilt 8s ease-in-out infinite;
+}
+
+.product-card:hover .product-image img {
+    animation: none; /* hover pe enhance wala effect chale */
+    transform: scale(1.16) rotate(1.5deg);
+    filter: brightness(1.07) contrast(1.04) saturate(1.05);
+}
+
+/* Card itself soft float */
+.product-card {
+    animation: cardIn 0.7s ease-out both, cardFloat 6s ease-in-out infinite;
+}
+
+.product-card:nth-child(odd)  { animation-delay: 0s, 0s; }
+.product-card:nth-child(even) { animation-delay: 0.1s, 1.5s; }
+
+.product-card:hover {
+    animation: none;
+    transform: translateY(-16px) rotateX(5deg) rotateY(-3deg) scale(1.025);
+}
+
+/* Category images soft move */
+.cat-card img {
+    animation: floatTilt 10s ease-in-out infinite;
+}
+
+.cat-card:hover img {
+    animation: none;
+}
+
+/* ========== CUSTOM ORDER MODAL (Theme ke according) ========== */
+.order-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(42, 36, 32, 0.45);
+    backdrop-filter: blur(8px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.4s;
+    padding: 20px;
+}
+
+.order-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.order-modal {
+    background: linear-gradient(165deg, #fffefb 0%, #faf6f1 100%);
+    border-radius: 24px;
+    padding: 36px 32px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow:
+        0 30px 80px rgba(42, 36, 32, 0.2),
+        0 0 0 1px rgba(196, 164, 132, 0.2);
+    transform: translateY(30px) scale(0.95);
+    transition: 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+}
+
+.order-modal-overlay.active .order-modal {
+    transform: translateY(0) scale(1);
+}
+
+.order-modal h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 8px;
+    color: #2a2420;
+}
+
+.order-modal .modal-sub {
+    text-align: center;
+    font-size: 13px;
+    color: #6b5e54;
+    margin-bottom: 28px;
+    font-weight: 300;
+}
+
+.order-modal label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #a8845c;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.order-modal input,
+.order-modal textarea {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1px solid rgba(196, 164, 132, 0.35);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.8);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    color: #2a2420;
+    margin-bottom: 16px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.order-modal input:focus,
+.order-modal textarea:focus {
+    border-color: #c4a484;
+    box-shadow: 0 0 0 3px rgba(196, 164, 132, 0.15);
+    background: #fff;
+}
+
+.order-modal textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 50px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.35s;
+    border: none;
+}
+
+.modal-btn.cancel {
+    background: transparent;
+    border: 1px solid rgba(196, 164, 132, 0.4);
+    color: #6b5e54;
+}
+
+.modal-btn.cancel:hover {
+    border-color: #2a2420;
+    color: #2a2420;
+}
+
+.modal-btn.confirm {
+    background: linear-gradient(135deg, #2a2420, #3d342e);
+    color: #faf6f1;
+    box-shadow: 0 8px 24px rgba(42, 36, 32, 0.2);
+}
+
+.modal-btn.confirm:hover {
+    background: linear-gradient(135deg, #a8845c, #c4a484);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(168, 132, 92, 0.35);
+}
+
+.modal-close {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #b0a49a;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.modal-close:hover {
+    color: #2a2420;
+}
+
+/* Loading / empty messages theme */
+.products-grid > p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: #6b5e54;
+    letter-spacing: 0.5px;
+}
