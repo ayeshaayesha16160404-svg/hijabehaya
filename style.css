@@ -1082,3 +1082,111 @@ footer {
     visibility: visible;
     transform: translate(-50%, -50%) scale(1);
 }
+/* ========== CART: WhatsApp button hamesha neeche dikhe ========== */
+.cart-sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+#cart-items {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.cart-footer {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding: 16px 22px 20px;
+    border-top: 1px solid #eee;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* ========== ORDER MODAL: ek screen, kam scroll ========== */
+.order-modal-overlay {
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+}
+
+.order-modal {
+    padding: 20px 18px 16px;
+    max-width: 400px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* bahar scroll band */
+}
+
+.modal-header {
+    margin-bottom: 10px;
+    flex-shrink: 0;
+}
+
+.order-modal h3 {
+    font-size: 22px;
+    margin-bottom: 2px;
+}
+
+.modal-sub {
+    font-size: 11px;
+}
+
+.pay-info {
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+.pay-info-title {
+    margin-bottom: 4px;
+    font-size: 11px;
+}
+
+.pay-note {
+    margin-top: 4px !important;
+    font-size: 11px;
+}
+
+/* form fields tight */
+.order-modal label {
+    margin-bottom: 3px;
+    font-size: 10px;
+}
+
+.order-modal input,
+.order-modal textarea,
+.order-modal select {
+    padding: 9px 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    border-radius: 10px;
+}
+
+.order-modal textarea {
+    min-height: 52px;
+}
+
+/* buttons hamesha modal ke bottom pe */
+.modal-actions {
+    margin-top: 6px;
+    flex-shrink: 0;
+    padding-top: 4px;
+}
+
+.modal-btn {
+    padding: 12px;
+    font-size: 12px;
+}
+
+/* agar phir bhi chhoti screen ho to sirf fields scroll, buttons fixed */
+.order-modal-fields {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    padding-right: 2px;
+}
