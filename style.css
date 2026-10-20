@@ -1070,7 +1070,30 @@ footer {
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(201, 168, 108, 0.3);
 }
+.toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: linear-gradient(135deg, #2c2c2c, #3d342e);
+    color: #faf7f2;
+    padding: 14px 28px;
+    border-radius: 50px;
+    font-size: 13px;
+    z-index: 3000;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.4s;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(201, 168, 108, 0.3);
+    pointer-events: none;
+}
 
+.toast.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
 .toast.show {
     opacity: 1;
     visibility: visible;
