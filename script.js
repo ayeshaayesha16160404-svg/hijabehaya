@@ -254,19 +254,16 @@ ${productsText}
 Please confirm. JazakAllah!`;
 
   // Google Sheet mein save
-  try {
-    fetch(ORDERS_API, {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify({
-        name: name,
-        phone: phone,
-        address: address,
-        products: productsText,
-        total: total
-      })
-    });
-  } catch (e) {}
+ //
+  // Google Sheet save
+const sheetUrl = ORDERS_API + 
+  "?name=" + encodeURIComponent(name) +
+  "&phone=" + encodeURIComponent(phone) +
+  "&address=" + encodeURIComponent(address) +
+  "&products=" + encodeURIComponent(productsText) +
+  "&total=" + encodeURIComponent(total);
+
+fetch(sheetUrl).catch(function(){});
 
   // ========== MOBILE PE SEEDHA WHATSAPP APP ==========
   const number = "923707695136"; // ← Apna number yahan daalo (92 se start)
