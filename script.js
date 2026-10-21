@@ -1,5 +1,5 @@
 // ====================== CONFIG ======================
-const PRODUCTS_API = "https://script.google.com/macros/s/AKfycbypksr8TvMRX9TA2Dnxw6EhySvWgZMknrbXOLBx-pQJCn2pAUWv6BNbk0sjH2rqP9DT3g/exec";
+const PRODUCTS_API = "https://script.google.com/macros/s/AKfycbzQJQ_8Y3azYUayYS4COsbKIckuiFtyl9j33PUChgxNsI3czKozjVpXvkmnwoEF5N8arQ/exec";
 const ORDERS_API   = "https://script.google.com/macros/s/AKfycbzeDWzb9MjDeXjwCIqMO-isuHYAOfNHEtRm6jXosJ9Azgx9VnYZ4f4fUi8kBy_hH3W0/exec";
 const WHATSAPP_NUMBER = "923707695136";
 const PAYMENT_NUMBER_DISPLAY = "0370-7695136"; // JazzCash / EasyPaisa / NayaPay (same as WP)
@@ -140,20 +140,70 @@ async function loadProducts() {
 }
 
 // ====================== COLOURS HELPER ======================
-function parseColours(product) {
-  var raw = product.colors || product.colours || product.color || product.colour || "";
+function splitList(raw) {
+  if (raw == null || raw === "") return [];
   if (Array.isArray(raw)) {
-    return raw.map(function (c) { return String(c).trim(); }).filter(Boolean);
+    return raw.map(function (x) { return String(x).trim(); }).filter(Boolean);
   }
-  if (typeof raw === "string" && raw.trim()) {
-    return raw.split(/[,|/]+/).map(function (c) { return c.trim(); }).filter(Boolean);
+  return String(raw)
+    .split(/[,|\/•]+|\band\b/i)
+    .map(function (x) { return x.replace(/^[\s:°\-–—]+/, "").trim(); })
+    .filter(function (x) { return x.length > 0 && x.length < 40; });
+}
+
+function parseColours(product) {
+  // Direct sheet fields (any casing / naming)
+  var raw =
+    product.colors ||
+    product.colours ||
+    product.Colors ||
+    product.Colours ||
+    product.color ||
+    product.colour ||
+    product.COLOR ||
+    product.COLOUR ||
+    "";
+  var list = splitList(raw);
+  if (list.length) return list;
+
+  // Fallback: extract from description (e.g. "COLOR : blue , beige")
+  var desc = product.desc || product.description || "";
+  var m = desc.match(/(?:colors?|colours?)\s*[:\-–—]?\s*([^\n\r.🔥]+)/i);
+  if (m && m[1]) {
+    list = splitList(m[1]);
+    // filter out junk words
+    list = list.filter(function (c) {
+      return !/^(available|in|all|and|the|with|for)$/i.test(c);
+    });
+    if (list.length) return list;
+  }
+  return [];
+}
+
+function parseSizes(product) {
+  var raw =
+    product.sizes ||
+    product.Sizes ||
+    product.size ||
+    product.Size ||
+    product.SIZE ||
+    product.SIZES ||
+    "";
+  var list = splitList(raw);
+  if (list.length) return list;
+
+  var desc = product.desc || product.description || "";
+  var m = desc.match(/(?:sizes?)\s*[:\-–—]?\s*([^\n\r.🔥]+)/i);
+  if (m && m[1]) {
+    list = splitList(m[1]);
+    if (list.length) return list;
   }
   return [];
 }
 
 
 function isNewProduct(product) {
-  var v = product.isNew != null ? product.isNew : (product.new != null ? product.new : product.is_new);
+  var v = product.isNew != null ? product.isNew : (product.new != null ? product.new : (product.is_new != null ? product.is_new : product.IsNew));
   if (v === true || v === 1 || v === "1") return true;
   if (typeof v === "string") {
     var s = v.toLowerCase().trim();
@@ -162,23 +212,12 @@ function isNewProduct(product) {
   return false;
 }
 
-
-function parseSizes(product) {
-  var raw = product.sizes || product.size || "";
-  if (Array.isArray(raw)) {
-    return raw.map(function (s) { return String(s).trim(); }).filter(Boolean);
-  }
-  if (typeof raw === "string" && raw.trim()) {
-    return raw.split(/[,|/]+/).map(function (s) { return s.trim(); }).filter(Boolean);
-  }
-  return [];
-}
-
 function getStock(product) {
-  if (product.stock === undefined || product.stock === null || product.stock === "") return null;
-  var n = Number(product.stock);
+  var stockRaw = product.stock != null ? product.stock : product.Stock;
+  if (stockRaw === undefined || stockRaw === null || stockRaw === "") return null;
+  var n = Number(stockRaw);
   if (!isNaN(n)) return n;
-  var s = String(product.stock).toLowerCase().trim();
+  var s = String(stockRaw).toLowerCase().trim();
   if (s === "out" || s === "out of stock" || s === "oos") return 0;
   if (s === "in stock" || s === "available") return 99;
   return null;
@@ -410,11 +449,13 @@ async function loadProductPage() {
   });
 
   const descHtml = descToFullBullets(product.desc || "");
-  const fabricLine = product.fabric
-    ? '<p class="fabric-line"><strong>Fabric:</strong> ' + product.fabric + "</p>"
+  var fabricVal = product.fabric || product.Fabric || product.FABRIC || "";
+  const fabricLine = fabricVal
+    ? '<p class="fabric-line"><strong>Fabric:</strong> ' + fabricVal + "</p>"
     : "";
-  const skuLine = product.sku
-    ? '<p class="meta-line"><strong>SKU:</strong> ' + product.sku + "</p>"
+  var skuVal = product.sku || product.SKU || product.Sku || "";
+  const skuLine = skuVal
+    ? '<p class="meta-line"><strong>SKU:</strong> ' + skuVal + "</p>"
     : "";
   const stockVal = getStock(product);
   let stockHtml = "";
