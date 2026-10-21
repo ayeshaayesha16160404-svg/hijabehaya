@@ -14,23 +14,35 @@
     </div>
 
     <header>
-        <div class="logo"><a href="index.html">Hijab-e-Haya<span>.</span></a></div>
-
         <button type="button" class="menu-toggle" id="menuToggle" aria-label="Open menu" onclick="toggleMobileMenu()">
             <span></span><span></span><span></span>
         </button>
 
-        <nav id="mainNav">
-            <a href="#products" onclick="navFilter('all'); return true;">All</a>
-            <a href="#products" onclick="navFilter('hijab'); return true;">Hijabs</a>
-            <a href="#products" onclick="navFilter('abaya'); return true;">Abayas</a>
-            <a href="#products" onclick="navFilter('accessory'); return true;">Accessories</a>
-        </nav>
+        <div class="logo"><a href="index.html">Hijab-e-Haya<span>.</span></a></div>
 
         <div class="cart-btn" onclick="toggleCart()">
             🛒 <span id="cart-count">0</span>
         </div>
     </header>
+
+    <!-- Side Drawer Menu -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeMobileMenu()"></div>
+    <aside class="side-drawer" id="mainNav">
+        <div class="drawer-header">
+            <p class="drawer-brand">Hijab-e-Haya</p>
+            <button type="button" class="drawer-close" onclick="closeMobileMenu()" aria-label="Close menu">×</button>
+        </div>
+        <nav class="drawer-nav">
+            <a href="#products" onclick="navFilter('all'); return false;">All Collection</a>
+            <a href="#products" onclick="navFilter('new'); return false;">New Arrivals</a>
+            <a href="#products" onclick="navFilter('hijab'); return false;">Hijabs</a>
+            <a href="#products" onclick="navFilter('abaya'); return false;">Abayas</a>
+            <a href="#products" onclick="navFilter('accessory'); return false;">Accessories</a>
+        </nav>
+        <div class="drawer-footer">
+            <p>Premium Modest Wear</p>
+        </div>
+    </aside>
 
     <!-- Hero -->
     <section class="hero">
@@ -63,6 +75,7 @@
             <h2 class="section-title">Our Collection</h2>
             <div class="filter-btns">
                 <button class="filter-btn active" onclick="filterProducts('all')">All</button>
+                <button class="filter-btn" onclick="filterProducts('new')">New</button>
                 <button class="filter-btn" onclick="filterProducts('hijab')">Hijabs</button>
                 <button class="filter-btn" onclick="filterProducts('abaya')">Abayas</button>
                 <button class="filter-btn" onclick="filterProducts('accessory')">Accessories</button>
@@ -125,8 +138,14 @@
             <div class="pay-info">
                 <div class="pay-info-title">Payment & Delivery</div>
                 <p>• <strong>Cash on Delivery</strong> products ke liye available hai</p>
-                <p>• <strong>Delivery charges advance</strong> mein dene honge</p>
-                <p class="pay-note">Order confirm hone ke baad delivery charges ka method bata diya jayega (JazzCash / EasyPaisa / Bank).</p>
+                <p>• <strong>Delivery charges ADVANCE</strong> — pehle pay karni hongi</p>
+                <div class="pay-numbers">
+                    <p class="pay-num-title">Advance shipping / payment number:</p>
+                    <p class="pay-num"><strong>JazzCash / EasyPaisa / NayaPay</strong></p>
+                    <p class="pay-num-value">0370-7695136</p>
+                    <p class="pay-num-note">(Same as WhatsApp number)</p>
+                </div>
+                <p class="pay-note">Order place karne ke baad is number pe delivery charges bhej dein. Screenshot WhatsApp pe share karein.</p>
             </div>
             <div class="order-modal-fields">
                 <label>Full Name</label>
