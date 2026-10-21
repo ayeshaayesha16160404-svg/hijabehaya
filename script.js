@@ -515,9 +515,9 @@ async function loadProductPage() {
   });
 
   const descHtml = descToFullBullets(product.desc || "");
-  var fabricVal = product.fabric || product.Fabric || product.FABRIC || "";
+  var fabricVal = product.material || product.Material || product.fabric || product.Fabric || product.FABRIC || "";
   const fabricLine = fabricVal
-    ? '<p class="fabric-line"><strong>Fabric:</strong> ' + fabricVal + "</p>"
+    ? '<p class="fabric-line"><strong>Material:</strong> ' + fabricVal + "</p>"
     : "";
   var skuVal = product.sku || product.SKU || product.Sku || "";
   const skuLine = skuVal
