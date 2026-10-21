@@ -3,12 +3,56 @@ const PRODUCTS_API = "https://script.google.com/macros/s/AKfycbypksr8TvMRX9TA2Dn
 const ORDERS_API   = "https://script.google.com/macros/s/AKfycbzeDWzb9MjDeXjwCIqMO-isuHYAOfNHEtRm6jXosJ9Azgx9VnYZ4f4fUi8kBy_hH3W0/exec";
 const WHATSAPP_NUMBER = "923707695136";
 
+// Common colour name → hex (for swatches when sheet has names)
+const COLOUR_MAP = {
+  black: "#1a1a1a",
+  white: "#f5f5f5",
+  cream: "#f5e6d3",
+  beige: "#d4c4a8",
+  brown: "#6b4423",
+  navy: "#1a2a4a",
+  blue: "#3a5a8c",
+  grey: "#8a8a8a",
+  gray: "#8a8a8a",
+  pink: "#e8b4b8",
+  rose: "#d4a5a5",
+  red: "#c45c5c",
+  maroon: "#6b2d2d",
+  green: "#4a6b4a",
+  olive: "#6b6b3a",
+  gold: "#c9a86c",
+  purple: "#6b4a6b",
+  orange: "#d4894a",
+  yellow: "#e8d48a",
+  teal: "#3a6b6b"
+};
+
 // ====================== GLOBAL ======================
 let products = [];
 let cart = JSON.parse(localStorage.getItem("haya_cart")) || [];
 let toastTimer = null;
+let selectedColour = "";
 
-// ====================== TOAST (larger + action button) ======================
+// ====================== MOBILE MENU ======================
+function toggleMobileMenu() {
+  var nav = document.getElementById("mainNav");
+  var btn = document.getElementById("menuToggle");
+  if (!nav) return;
+  nav.classList.toggle("open");
+  if (btn) btn.classList.toggle("active");
+}
+
+function navFilter(category) {
+  filterProducts(category);
+  var nav = document.getElementById("mainNav");
+  var btn = document.getElementById("menuToggle");
+  if (nav) nav.classList.remove("open");
+  if (btn) btn.classList.remove("active");
+  var section = document.getElementById("products");
+  if (section) section.scrollIntoView({ behavior: "smooth" });
+}
+
+// ====================== TOAST ======================
 function showToast(msg, withCartBtn) {
   var t = document.getElementById("toastMsg");
   if (!t) {
@@ -17,26 +61,20 @@ function showToast(msg, withCartBtn) {
     t.className = "toast";
     document.body.appendChild(t);
   }
-
-  // Clear previous timer
   if (toastTimer) {
     clearTimeout(toastTimer);
     toastTimer = null;
   }
-
   var html = '<div class="toast-msg">' + msg + "</div>";
   if (withCartBtn) {
     html +=
       '<div class="toast-actions">' +
-      '<button type="button" class="toast-btn" onclick="openCartFromToast()">View Bag / Cart</button>' +
+      '<button type="button" class="toast-btn" onclick="openCartFromToast()">View Cart</button>' +
       '<button type="button" class="toast-btn secondary" onclick="hideToast()">Close</button>' +
       "</div>";
   }
-
   t.innerHTML = html;
   t.classList.add("show");
-
-  // Longer time when action button is present
   var duration = withCartBtn ? 4500 : 2500;
   toastTimer = setTimeout(function () {
     hideToast();
@@ -72,7 +110,13 @@ async function loadProducts() {
   try {
     const res = await fetch(PRODUCTS_API);
     products = await res.json();
-    displayProducts();
+    var saved = sessionStorage.getItem("haya_filter");
+    if (saved) {
+      sessionStorage.removeItem("haya_filter");
+      displayProducts(saved);
+    } else {
+      displayProducts();
+    }
   } catch (err) {
     console.error(err);
     if (grid) {
@@ -82,12 +126,39 @@ async function loadProducts() {
   }
 }
 
-// ====================== HELPER: description → bullets ======================
+// ====================== COLOURS HELPER ======================
+function parseColours(product) {
+  var raw = product.colors || product.colours || product.color || product.colour || "";
+  if (Array.isArray(raw)) {
+    return raw.map(function (c) { return String(c).trim(); }).filter(Boolean);
+  }
+  if (typeof raw === "string" && raw.trim()) {
+    return raw.split(/[,|/]+/).map(function (c) { return c.trim(); }).filter(Boolean);
+  }
+  return [];
+}
+
+function colourToHex(name) {
+  var key = String(name).toLowerCase().trim();
+  if (COLOUR_MAP[key]) return COLOUR_MAP[key];
+  if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(key)) return key;
+  return "#c9a86c";
+}
+
+function selectColour(name, el) {
+  selectedColour = name;
+  document.querySelectorAll(".colour-swatch").forEach(function (s) {
+    s.classList.remove("active");
+  });
+  if (el) el.classList.add("active");
+  var nameEl = document.getElementById("selectedColourName");
+  if (nameEl) nameEl.textContent = name;
+}
+
+// ====================== DESCRIPTION → BULLETS ======================
 function descToBullets(desc, maxPoints) {
   if (!desc || typeof desc !== "string") return "";
   maxPoints = maxPoints || 3;
-
-  // Split by newlines, bullet chars, or " - " / "•"
   var points = desc
     .split(/[\n\r]+|•|–|—|\s[-–]\s/)
     .map(function (s) {
@@ -96,14 +167,11 @@ function descToBullets(desc, maxPoints) {
     .filter(function (s) {
       return s.length > 2;
     });
-
   if (points.length === 0) {
-    // plain paragraph — take first sentence or short text
     var short = desc.trim();
     if (short.length > 90) short = short.slice(0, 87) + "...";
     return '<ul class="card-desc"><li>' + short + "</li></ul>";
   }
-
   var limited = points.slice(0, maxPoints);
   var html = '<ul class="card-desc">';
   limited.forEach(function (p) {
@@ -127,11 +195,9 @@ function descToFullBullets(desc) {
     .filter(function (s) {
       return s.length > 2;
     });
-
   if (points.length === 0) {
     return '<p class="desc">' + desc + "</p>";
   }
-
   var html = '<ul class="detail-desc">';
   points.forEach(function (p) {
     html += "<li>" + p + "</li>";
@@ -209,10 +275,10 @@ function displayProducts(filter) {
       bulletsHtml +
       "</div>" +
       "</a>" +
-      '<div style="padding:0 18px 18px;text-align:center;">' +
+      '<div style="padding:0 16px 16px;text-align:center;">' +
       '<button class="add-btn" onclick="event.preventDefault(); addToCart(' +
       product.id +
-      ')">Add to Bag</button>' +
+      ')">Add to Cart</button>' +
       "</div>" +
       "</div>";
   });
@@ -275,6 +341,32 @@ async function loadProductPage() {
   });
 
   const descHtml = descToFullBullets(product.desc || "");
+  const colours = parseColours(product);
+  selectedColour = colours.length ? colours[0] : "";
+
+  let colourHtml = "";
+  if (colours.length > 0) {
+    colourHtml = '<div class="colour-section"><span class="colour-label">Colour</span><div class="colour-options">';
+    colours.forEach(function (c, i) {
+      var hex = colourToHex(c);
+      var isLight = /white|cream|beige|yellow|pink|rose/i.test(c);
+      colourHtml +=
+        '<button type="button" class="colour-swatch' +
+        (i === 0 ? " active" : "") +
+        '" style="background:' +
+        hex +
+        (isLight ? ";border-color:#ccc" : "") +
+        '" title="' +
+        c +
+        '" onclick="selectColour(\'' +
+        c.replace(/'/g, "\\'") +
+        "', this)\"></button>";
+    });
+    colourHtml +=
+      '</div><p class="colour-name">Selected: <strong id="selectedColourName">' +
+      selectedColour +
+      "</strong></p></div>";
+  }
 
   container.innerHTML =
     "<div>" +
@@ -299,10 +391,11 @@ async function loadProductPage() {
     " " +
     oldPriceHtml +
     "</div>" +
+    colourHtml +
     descHtml +
     '<button class="add-btn-large" onclick="addToCart(' +
     product.id +
-    ')">Add to Bag</button>' +
+    ')">Add to Cart</button>' +
     "</div>";
 }
 
@@ -321,20 +414,33 @@ function addToCart(id) {
   });
   if (!product) return;
 
+  var colour = selectedColour || "";
+  // On listing page, no colour selected — still allow add
+  if (document.getElementById("product-detail") && parseColours(product).length > 0 && !colour) {
+    showToast("Please select a colour");
+    return;
+  }
+
   const existing = cart.find(function (item) {
-    return item.id === id;
+    return item.id === id && (item.colour || "") === colour;
   });
 
   if (existing) {
     existing.quantity += 1;
   } else {
-    cart.push(Object.assign({}, product, { quantity: 1 }));
+    cart.push(
+      Object.assign({}, product, {
+        quantity: 1,
+        colour: colour
+      })
+    );
   }
 
   saveCart();
   updateCartUI();
-  // Larger toast + "View Bag / Cart" button
-  showToast(product.name + " bag mein add ho gaya ✓", true);
+  var msg = product.name + " cart mein add ho gaya ✓";
+  if (colour) msg = product.name + " (" + colour + ") cart mein add ho gaya ✓";
+  showToast(msg, true);
 }
 
 function saveCart() {
@@ -353,13 +459,16 @@ function updateCartUI() {
 
   if (cart.length === 0) {
     cartItems.innerHTML =
-      '<p style="text-align:center;color:#999;margin-top:50px;">Your bag is empty</p>';
+      '<p style="text-align:center;color:#999;margin-top:50px;">Your cart is empty</p>';
   }
 
-  cart.forEach(function (item) {
+  cart.forEach(function (item, index) {
     total += item.price * item.quantity;
     count += item.quantity;
     const img = item.images && item.images[0] ? item.images[0] : "";
+    var colourLine = item.colour
+      ? '<p style="font-size:12px;color:#888;">Colour: ' + item.colour + "</p>"
+      : "";
 
     cartItems.innerHTML +=
       '<div class="cart-item">' +
@@ -369,23 +478,30 @@ function updateCartUI() {
       item.name +
       '">' +
       '<div class="cart-item-info">' +
-      '<h4 style="font-size:14px;margin-bottom:4px;">' +
+      '<h4 style="font-size:13px;margin-bottom:2px;">' +
       item.name +
       "</h4>" +
-      '<p style="font-size:13px;color:#666;">Rs. ' +
+      colourLine +
+      '<p style="font-size:12px;color:#666;">Rs. ' +
       item.price +
       " × " +
       item.quantity +
       "</p>" +
       "</div>" +
-      '<button onclick="removeFromCart(' +
-      item.id +
+      '<button onclick="removeFromCartAt(' +
+      index +
       ')" style="background:none;border:none;font-size:16px;cursor:pointer;">🗑️</button>' +
       "</div>";
   });
 
   if (cartCount) cartCount.innerText = count;
   if (totalEl) totalEl.innerText = "Rs. " + total.toLocaleString();
+}
+
+function removeFromCartAt(index) {
+  cart.splice(index, 1);
+  saveCart();
+  updateCartUI();
 }
 
 function removeFromCart(id) {
@@ -410,12 +526,12 @@ function toggleCart() {
 // ====================== ORDER MODAL ======================
 function orderOnWhatsApp() {
   if (cart.length === 0) {
-    showToast("Your bag is empty");
+    showToast("Your cart is empty");
     return;
   }
   var modal = document.getElementById("orderModal");
   if (!modal) {
-    showToast("Order form missing — HTML mein modal add karein");
+    showToast("Order form missing");
     return;
   }
   modal.classList.add("active");
@@ -457,6 +573,7 @@ async function submitOrder() {
   cart.forEach(function (item) {
     productsText +=
       item.name +
+      (item.colour ? " [" + item.colour + "]" : "") +
       " (Qty: " +
       item.quantity +
       ") - Rs." +
@@ -539,7 +656,6 @@ async function submitOrder() {
   }, 600);
 }
 
-// Modal overlay click to close
 document.addEventListener("click", function (e) {
   var modal = document.getElementById("orderModal");
   if (modal && e.target === modal) closeOrderModal();
