@@ -1,5 +1,5 @@
 // ====================== CONFIG ======================
-const PRODUCTS_API = "https://script.google.com/macros/s/AKfycbxIZCSXPl8iwXMvWOFY4P1HCmKinXFysFmhPkI3Lo6lk9doLOM76AuaTAem1eVa0ZM/exec";
+const PRODUCTS_API = "https://script.google.com/macros/s/AKfycbzGtZUfz8mnnjvSaXoTgeKVsJvE1HMHY9ikWSDVTWo0iyIsDQQO-_sdFRKvTdcsQRvsbA/exec";
 const ORDERS_API   = "https://script.google.com/macros/s/AKfycbyubZ2lLFAdVynU10oItaFWtfiB9k067X9JIsGRpmLEjk5a5BmsxUWKU2fLuRaQbcSSzw/exec";
 const WHATSAPP_NUMBER = "923707695136";
 const PAYMENT_NUMBER_DISPLAY = "0370-7695136"; // JazzCash / EasyPaisa / NayaPay (same as WP)
