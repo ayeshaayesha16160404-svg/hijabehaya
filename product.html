@@ -14,11 +14,18 @@
 
     <header>
         <div class="logo"><a href="index.html">Hijab-e-Haya<span>.</span></a></div>
-        <nav>
-            <a href="index.html#hijabs">Hijabs</a>
-            <a href="index.html#abayas">Abayas</a>
-            <a href="index.html#accessories">Accessories</a>
+
+        <button type="button" class="menu-toggle" id="menuToggle" aria-label="Open menu" onclick="toggleMobileMenu()">
+            <span></span><span></span><span></span>
+        </button>
+
+        <nav id="mainNav">
+            <a href="index.html#products" onclick="sessionStorage.setItem('haya_filter','all')">All</a>
+            <a href="index.html#products" onclick="sessionStorage.setItem('haya_filter','hijab')">Hijabs</a>
+            <a href="index.html#products" onclick="sessionStorage.setItem('haya_filter','abaya')">Abayas</a>
+            <a href="index.html#products" onclick="sessionStorage.setItem('haya_filter','accessory')">Accessories</a>
         </nav>
+
         <div class="cart-btn" onclick="toggleCart()">
             🛒 <span id="cart-count">0</span>
         </div>
@@ -33,7 +40,7 @@
     <!-- Cart -->
     <div class="cart-sidebar" id="cart">
         <div class="cart-header">
-            <h3>Your Bag</h3>
+            <h3>Your Cart</h3>
             <button onclick="toggleCart()">✕</button>
         </div>
         <div id="cart-items"></div>
