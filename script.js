@@ -2,6 +2,7 @@
 const PRODUCTS_API = "https://script.google.com/macros/s/AKfycbypksr8TvMRX9TA2Dnxw6EhySvWgZMknrbXOLBx-pQJCn2pAUWv6BNbk0sjH2rqP9DT3g/exec";
 const ORDERS_API   = "https://script.google.com/macros/s/AKfycbzeDWzb9MjDeXjwCIqMO-isuHYAOfNHEtRm6jXosJ9Azgx9VnYZ4f4fUi8kBy_hH3W0/exec";
 const WHATSAPP_NUMBER = "923707695136";
+const PAYMENT_NUMBER_DISPLAY = "0370-7695136"; // JazzCash / EasyPaisa / NayaPay (same as WP)
 
 // Common colour name → hex (for swatches when sheet has names)
 const COLOUR_MAP = {
@@ -32,22 +33,34 @@ let products = [];
 let cart = JSON.parse(localStorage.getItem("haya_cart")) || [];
 let toastTimer = null;
 let selectedColour = "";
+let selectedSize = "";
 
-// ====================== MOBILE MENU ======================
+// ====================== SIDE DRAWER MENU ======================
 function toggleMobileMenu() {
   var nav = document.getElementById("mainNav");
   var btn = document.getElementById("menuToggle");
+  var overlay = document.getElementById("drawerOverlay");
   if (!nav) return;
-  nav.classList.toggle("open");
-  if (btn) btn.classList.toggle("active");
+  var opening = !nav.classList.contains("open");
+  nav.classList.toggle("open", opening);
+  if (btn) btn.classList.toggle("active", opening);
+  if (overlay) overlay.classList.toggle("active", opening);
+  document.body.style.overflow = opening ? "hidden" : "";
+}
+
+function closeMobileMenu() {
+  var nav = document.getElementById("mainNav");
+  var btn = document.getElementById("menuToggle");
+  var overlay = document.getElementById("drawerOverlay");
+  if (nav) nav.classList.remove("open");
+  if (btn) btn.classList.remove("active");
+  if (overlay) overlay.classList.remove("active");
+  document.body.style.overflow = "";
 }
 
 function navFilter(category) {
   filterProducts(category);
-  var nav = document.getElementById("mainNav");
-  var btn = document.getElementById("menuToggle");
-  if (nav) nav.classList.remove("open");
-  if (btn) btn.classList.remove("active");
+  closeMobileMenu();
   var section = document.getElementById("products");
   if (section) section.scrollIntoView({ behavior: "smooth" });
 }
@@ -138,6 +151,49 @@ function parseColours(product) {
   return [];
 }
 
+
+function isNewProduct(product) {
+  var v = product.isNew != null ? product.isNew : (product.new != null ? product.new : product.is_new);
+  if (v === true || v === 1 || v === "1") return true;
+  if (typeof v === "string") {
+    var s = v.toLowerCase().trim();
+    return s === "yes" || s === "true" || s === "new" || s === "y";
+  }
+  return false;
+}
+
+
+function parseSizes(product) {
+  var raw = product.sizes || product.size || "";
+  if (Array.isArray(raw)) {
+    return raw.map(function (s) { return String(s).trim(); }).filter(Boolean);
+  }
+  if (typeof raw === "string" && raw.trim()) {
+    return raw.split(/[,|/]+/).map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+  return [];
+}
+
+function getStock(product) {
+  if (product.stock === undefined || product.stock === null || product.stock === "") return null;
+  var n = Number(product.stock);
+  if (!isNaN(n)) return n;
+  var s = String(product.stock).toLowerCase().trim();
+  if (s === "out" || s === "out of stock" || s === "oos") return 0;
+  if (s === "in stock" || s === "available") return 99;
+  return null;
+}
+
+function selectSize(size, el) {
+  selectedSize = size;
+  document.querySelectorAll(".size-btn").forEach(function (b) {
+    b.classList.remove("active");
+  });
+  if (el) el.classList.add("active");
+  var nameEl = document.getElementById("selectedSizeName");
+  if (nameEl) nameEl.textContent = size;
+}
+
 function colourToHex(name) {
   var key = String(name).toLowerCase().trim();
   if (COLOUR_MAP[key]) return COLOUR_MAP[key];
@@ -225,6 +281,10 @@ function displayProducts(filter) {
   const filtered =
     filter === "all"
       ? products
+      : filter === "new"
+      ? products.filter(function (p) {
+          return isNewProduct(p);
+        })
       : products.filter(function (p) {
           return p.category === filter;
         });
@@ -242,12 +302,22 @@ function displayProducts(filter) {
     const saleBadge = product.oldPrice
       ? '<div class="sale-badge">Sale</div>'
       : "";
+    const newBadge = isNewProduct(product)
+      ? '<div class="new-badge">New</div>'
+      : "";
     const oldPriceHtml = product.oldPrice
       ? '<span class="old-price">Rs. ' +
         Number(product.oldPrice).toLocaleString() +
         "</span>"
       : "";
     const bulletsHtml = descToBullets(product.desc, 3);
+    var stockVal = getStock(product);
+    var cardBtn =
+      stockVal !== null && stockVal <= 0
+        ? '<button class="add-btn disabled" disabled style="opacity:0.55;cursor:not-allowed;">Out of Stock</button>'
+        : '<button class="add-btn" onclick="event.preventDefault(); addToCart(' +
+          product.id +
+          ')">Add to Cart</button>';
 
     grid.innerHTML +=
       '<div class="product-card">' +
@@ -256,6 +326,7 @@ function displayProducts(filter) {
       '" style="text-decoration:none;color:inherit;">' +
       '<div class="product-image">' +
       saleBadge +
+      newBadge +
       '<img src="' +
       mainImage +
       '" alt="' +
@@ -276,9 +347,7 @@ function displayProducts(filter) {
       "</div>" +
       "</a>" +
       '<div style="padding:0 16px 16px;text-align:center;">' +
-      '<button class="add-btn" onclick="event.preventDefault(); addToCart(' +
-      product.id +
-      ')">Add to Cart</button>' +
+      cardBtn +
       "</div>" +
       "</div>";
   });
@@ -341,8 +410,28 @@ async function loadProductPage() {
   });
 
   const descHtml = descToFullBullets(product.desc || "");
+  const fabricLine = product.fabric
+    ? '<p class="fabric-line"><strong>Fabric:</strong> ' + product.fabric + "</p>"
+    : "";
+  const skuLine = product.sku
+    ? '<p class="meta-line"><strong>SKU:</strong> ' + product.sku + "</p>"
+    : "";
+  const stockVal = getStock(product);
+  let stockHtml = "";
+  if (stockVal !== null) {
+    if (stockVal <= 0) {
+      stockHtml = '<p class="stock-line out">Out of Stock</p>';
+    } else if (stockVal <= 5) {
+      stockHtml = '<p class="stock-line low">Only ' + stockVal + ' left in stock</p>';
+    } else {
+      stockHtml = '<p class="stock-line in">In Stock</p>';
+    }
+  }
+
   const colours = parseColours(product);
   selectedColour = colours.length ? colours[0] : "";
+  const sizes = parseSizes(product);
+  selectedSize = sizes.length ? sizes[0] : "";
 
   let colourHtml = "";
   if (colours.length > 0) {
@@ -368,6 +457,30 @@ async function loadProductPage() {
       "</strong></p></div>";
   }
 
+  let sizeHtml = "";
+  if (sizes.length > 0) {
+    sizeHtml = '<div class="size-section"><span class="colour-label">Size</span><div class="size-options">';
+    sizes.forEach(function (s, i) {
+      sizeHtml +=
+        '<button type="button" class="size-btn' +
+        (i === 0 ? " active" : "") +
+        '" onclick="selectSize(\'' +
+        s.replace(/'/g, "\\'") +
+        "', this)\">" +
+        s +
+        "</button>";
+    });
+    sizeHtml +=
+      '</div><p class="colour-name">Selected: <strong id="selectedSizeName">' +
+      selectedSize +
+      "</strong></p></div>";
+  }
+
+  var outOfStock = stockVal !== null && stockVal <= 0;
+  var addBtn = outOfStock
+    ? '<button class="add-btn-large disabled" disabled>Out of Stock</button>'
+    : '<button class="add-btn-large" onclick="addToCart(' + product.id + ')">Add to Cart</button>';
+
   container.innerHTML =
     "<div>" +
     '<a href="index.html" class="back-link">← Back to Collection</a>' +
@@ -386,19 +499,20 @@ async function loadProductPage() {
     "<h1>" +
     product.name +
     "</h1>" +
+    skuLine +
     '<div class="price">Rs. ' +
     Number(product.price).toLocaleString() +
     " " +
     oldPriceHtml +
     "</div>" +
+    stockHtml +
     colourHtml +
+    sizeHtml +
+    fabricLine +
     descHtml +
-    '<button class="add-btn-large" onclick="addToCart(' +
-    product.id +
-    ')">Add to Cart</button>' +
+    addBtn +
     "</div>";
 }
-
 function changeMainImage(src, el) {
   document.getElementById("main-product-image").src = src;
   document.querySelectorAll(".thumb").forEach(function (t) {
@@ -414,15 +528,31 @@ function addToCart(id) {
   });
   if (!product) return;
 
+  var stockVal = getStock(product);
+  if (stockVal !== null && stockVal <= 0) {
+    showToast("This item is out of stock");
+    return;
+  }
+
+  var onDetail = !!document.getElementById("product-detail");
   var colour = selectedColour || "";
-  // On listing page, no colour selected — still allow add
-  if (document.getElementById("product-detail") && parseColours(product).length > 0 && !colour) {
+  var size = selectedSize || "";
+
+  if (onDetail && parseColours(product).length > 0 && !colour) {
     showToast("Please select a colour");
+    return;
+  }
+  if (onDetail && parseSizes(product).length > 0 && !size) {
+    showToast("Please select a size");
     return;
   }
 
   const existing = cart.find(function (item) {
-    return item.id === id && (item.colour || "") === colour;
+    return (
+      item.id === id &&
+      (item.colour || "") === colour &&
+      (item.size || "") === size
+    );
   });
 
   if (existing) {
@@ -431,15 +561,19 @@ function addToCart(id) {
     cart.push(
       Object.assign({}, product, {
         quantity: 1,
-        colour: colour
+        colour: colour,
+        size: size,
+        sku: product.sku || ""
       })
     );
   }
 
   saveCart();
   updateCartUI();
-  var msg = product.name + " cart mein add ho gaya ✓";
-  if (colour) msg = product.name + " (" + colour + ") cart mein add ho gaya ✓";
+  var extra = [];
+  if (colour) extra.push(colour);
+  if (size) extra.push("Size " + size);
+  var msg = product.name + (extra.length ? " (" + extra.join(", ") + ")" : "") + " cart mein add ho gaya ✓";
   showToast(msg, true);
 }
 
@@ -466,8 +600,12 @@ function updateCartUI() {
     total += item.price * item.quantity;
     count += item.quantity;
     const img = item.images && item.images[0] ? item.images[0] : "";
-    var colourLine = item.colour
-      ? '<p style="font-size:12px;color:#888;">Colour: ' + item.colour + "</p>"
+    var metaParts = [];
+    if (item.colour) metaParts.push("Colour: " + item.colour);
+    if (item.size) metaParts.push("Size: " + item.size);
+    if (item.sku) metaParts.push("SKU: " + item.sku);
+    var metaLine = metaParts.length
+      ? '<p style="font-size:11px;color:#888;">' + metaParts.join(" · ") + "</p>"
       : "";
 
     cartItems.innerHTML +=
@@ -481,7 +619,7 @@ function updateCartUI() {
       '<h4 style="font-size:13px;margin-bottom:2px;">' +
       item.name +
       "</h4>" +
-      colourLine +
+      metaLine +
       '<p style="font-size:12px;color:#666;">Rs. ' +
       item.price +
       " × " +
@@ -570,15 +708,22 @@ async function submitOrder() {
   }
 
   var productsText = "";
+  var productsBullets = "";
   cart.forEach(function (item) {
-    productsText +=
+    var line =
+      "• " +
       item.name +
       (item.colour ? " [" + item.colour + "]" : "") +
-      " (Qty: " +
+      (item.size ? " Size:" + item.size : "") +
+      (item.sku ? " SKU:" + item.sku : "") +
+      " | Qty: " +
       item.quantity +
-      ") - Rs." +
+      " | Rs." +
       item.price +
-      " | ";
+      " each | Subtotal: Rs." +
+      item.price * item.quantity;
+    productsText += line + "\n";
+    productsBullets += line + "\n";
   });
 
   var total = cart.reduce(function (sum, item) {
@@ -605,35 +750,37 @@ async function submitOrder() {
     "• Delivery charges: ADVANCE\n" +
     "• Customer choice: " +
     delivery +
-    "\n\n" +
+    "\n" +
+    "• Pay on JazzCash / EasyPaisa / NayaPay: *" +
+    PAYMENT_NUMBER_DISPLAY +
+    "*\n\n" +
     "*Order:*\n" +
-    productsText +
+    productsBullets +
     "\n" +
     "*Products Total: Rs. " +
     total.toLocaleString() +
     "*\n\n" +
     "Please confirm. JazakAllah!";
 
-  var sheetProducts =
-    productsText +
-    " || City: " +
-    city +
-    " || Delivery: " +
-    delivery +
-    " || COD products + Advance delivery";
-
+  // Sheet: products as bullet lines (name, qty, unit price, subtotal)
   var sheetUrl =
     ORDERS_API +
     "?name=" +
     encodeURIComponent(name) +
     "&phone=" +
     encodeURIComponent(phone) +
+    "&city=" +
+    encodeURIComponent(city) +
     "&address=" +
-    encodeURIComponent(city + " — " + address) +
+    encodeURIComponent(address) +
     "&products=" +
-    encodeURIComponent(sheetProducts) +
+    encodeURIComponent(productsBullets.trim()) +
     "&total=" +
-    encodeURIComponent(total);
+    encodeURIComponent(total) +
+    "&delivery=" +
+    encodeURIComponent(delivery) +
+    "&status=" +
+    encodeURIComponent("Pending");
 
   try {
     await fetch(sheetUrl, { mode: "no-cors" });
