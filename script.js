@@ -25,6 +25,8 @@ const COLOUR_MAP = {
   purple: "#6b4a6b",
   orange: "#d4894a",
   yellow: "#e8d48a",
+  mauve: "#E0B0FF",
+  teal_blue: "#2e5470",
   teal: "#3a6b6b"
 };
 
