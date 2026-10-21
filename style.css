@@ -51,10 +51,11 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 50px;
+    gap: 12px;
+    padding: 14px clamp(16px, 4vw, 40px);
     position: sticky;
     top: 0;
-    background: rgba(250, 247, 242, 0.92);
+    background: rgba(250, 247, 242, 0.95);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     z-index: 100;
@@ -64,9 +65,10 @@ header {
 
 .logo {
     font-family: 'Playfair Display', serif;
-    font-size: 26px;
+    font-size: clamp(20px, 4vw, 26px);
     font-weight: 700;
     letter-spacing: 1px;
+    flex-shrink: 0;
 }
 
 .logo a {
@@ -78,12 +80,23 @@ header {
     color: var(--accent);
 }
 
+/* Desktop nav — centered menu */
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+}
+
 nav a {
-    margin: 0 16px;
+    margin: 0 6px;
     text-decoration: none;
     color: var(--text);
-    font-weight: 400;
-    font-size: 15px;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 50px;
     transition: 0.3s var(--ease);
     position: relative;
 }
@@ -91,13 +104,14 @@ nav a {
 nav a::after {
     content: '';
     position: absolute;
-    left: 0;
-    bottom: -4px;
-    width: 0;
+    left: 12px;
+    right: 12px;
+    bottom: 4px;
     height: 2px;
     background: linear-gradient(90deg, var(--accent), var(--rose));
-    transition: 0.3s var(--ease);
     border-radius: 2px;
+    transform: scaleX(0);
+    transition: 0.3s var(--ease);
 }
 
 nav a:hover {
@@ -105,24 +119,60 @@ nav a:hover {
 }
 
 nav a:hover::after {
-    width: 100%;
+    transform: scaleX(1);
 }
 
-/* Cart button — same light style as Add to Bag */
+/* Hamburger — hidden on desktop */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    background: #f5f0e8;
+    border: 1.5px solid var(--accent);
+    border-radius: 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.menu-toggle span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background: var(--accent-dark);
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+.menu-toggle.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+.menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+.menu-toggle.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Cart button */
 .cart-btn {
     background: #f5f0e8;
     color: var(--accent-dark);
     border: 1.5px solid var(--accent);
-    padding: 10px 18px;
+    padding: 8px 14px;
     border-radius: 50px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     transition: all 0.35s var(--ease);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     box-shadow: 0 4px 14px rgba(201, 168, 108, 0.15);
+    flex-shrink: 0;
 }
 
 .cart-btn:hover {
@@ -133,20 +183,25 @@ nav a:hover::after {
     box-shadow: 0 8px 20px rgba(201, 168, 108, 0.3);
 }
 
-/* ===== Hero ===== */
+/* ===== Hero — tighter, less empty space ===== */
 .hero {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 70px 50px;
-    min-height: 80vh;
+    justify-content: center;
+    padding: clamp(36px, 6vw, 56px) clamp(16px, 4vw, 40px);
+    min-height: auto;
+}
+
+.hero-content {
+    text-align: center;
+    max-width: 560px;
 }
 
 .hero-content h1 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(40px, 6.5vw, 68px);
-    line-height: 1.12;
-    margin-bottom: 18px;
+    font-size: clamp(32px, 6vw, 58px);
+    line-height: 1.15;
+    margin-bottom: 14px;
     background: linear-gradient(135deg, #2c2c2c 0%, #c9a86c 55%, #e8b4b8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -154,16 +209,17 @@ nav a:hover::after {
 }
 
 .hero-content p {
-    font-size: 17px;
+    font-size: clamp(14px, 2.5vw, 17px);
     color: #666;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* Shop Collection button — same light style as Add to Bag */
 .btn {
     display: inline-block;
-    padding: 14px 34px;
+    padding: 12px 28px;
     background: #f5f0e8;
     color: var(--accent-dark);
     border: 1.5px solid var(--accent);
@@ -178,20 +234,20 @@ nav a:hover::after {
     background: var(--accent);
     color: white;
     border-color: var(--accent);
-    transform: translateY(-4px);
+    transform: translateY(-3px);
     box-shadow: 0 12px 28px rgba(201, 168, 108, 0.3);
 }
 
 /* ===== Products ===== */
 .products-section {
-    padding: 50px;
+    padding: clamp(28px, 5vw, 48px) clamp(16px, 4vw, 40px);
 }
 
 .section-title {
     font-family: 'Playfair Display', serif;
-    font-size: 38px;
+    font-size: clamp(26px, 5vw, 36px);
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 28px;
     position: relative;
 }
 
@@ -201,20 +257,19 @@ nav a:hover::after {
     width: 56px;
     height: 3px;
     background: linear-gradient(90deg, var(--accent), var(--rose));
-    margin: 12px auto 0;
+    margin: 10px auto 0;
     border-radius: 2px;
 }
 
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-    gap: 36px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
 }
 
-/* Product Card — soft 3D hover */
 .product-card {
     background: var(--card);
-    border-radius: 20px;
+    border-radius: 18px;
     overflow: hidden;
     box-shadow: var(--shadow);
     transition: all 0.45s var(--ease);
@@ -224,14 +279,14 @@ nav a:hover::after {
 }
 
 .product-card:hover {
-    transform: translateY(-12px);
+    transform: translateY(-10px);
     box-shadow: var(--shadow-3d);
     z-index: 5;
 }
 
 .product-image {
     width: 100%;
-    height: 300px;
+    height: 260px;
     overflow: hidden;
     position: relative;
 }
@@ -262,41 +317,41 @@ nav a:hover::after {
 }
 
 .product-info {
-    padding: 18px;
+    padding: 14px 16px 8px;
     text-align: center;
 }
 
 .product-info h3 {
     font-family: 'Playfair Display', serif;
-    font-size: 19px;
-    margin-bottom: 6px;
+    font-size: 17px;
+    margin-bottom: 4px;
 }
 
 .product-info .price,
 .current-price {
     color: var(--accent-dark);
     font-weight: 600;
-    font-size: 17px;
-    margin-bottom: 14px;
+    font-size: 16px;
+    margin-bottom: 8px;
 }
 
 .old-price {
     text-decoration: line-through;
     color: #aaa;
-    font-size: 13px;
+    font-size: 12px;
     margin-left: 6px;
     font-weight: 400;
 }
 
 .price-box {
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
-/* Card description bullets (main page) */
+/* Card description bullets */
 .card-desc {
     list-style: none;
-    padding: 0 4px 8px;
-    margin: 0 0 4px;
+    padding: 0 4px 6px;
+    margin: 0 0 2px;
     text-align: left;
 }
 
@@ -305,8 +360,8 @@ nav a:hover::after {
     padding-left: 14px;
     font-size: 12px;
     color: #666;
-    line-height: 1.45;
-    margin-bottom: 4px;
+    line-height: 1.4;
+    margin-bottom: 3px;
 }
 
 .card-desc li::before {
@@ -320,49 +375,22 @@ nav a:hover::after {
 .card-desc li.more-dots {
     color: #aaa;
     font-size: 11px;
-    padding-left: 14px;
 }
 
 .card-desc li.more-dots::before {
     content: "";
 }
 
-/* Detail page full description bullets */
-.detail-desc {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 26px;
-}
-
-.detail-desc li {
-    position: relative;
-    padding-left: 18px;
-    font-size: 15px;
-    color: #555;
-    line-height: 1.7;
-    margin-bottom: 8px;
-}
-
-.detail-desc li::before {
-    content: "•";
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-weight: 600;
-    font-size: 16px;
-}
-
-/* Add to Bag — light style */
 .add-btn {
     background: #f5f0e8;
     border: 1.5px solid var(--accent);
     color: var(--accent-dark);
-    padding: 10px 26px;
+    padding: 9px 22px;
     border-radius: 50px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.35s var(--ease);
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .add-btn:hover {
@@ -373,20 +401,20 @@ nav a:hover::after {
     box-shadow: 0 8px 20px rgba(201, 168, 108, 0.3);
 }
 
-/* Categories — soft 3D */
+/* Categories */
 .categories {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    padding: 20px 50px 40px;
-    max-width: 1200px;
+    gap: 16px;
+    padding: 12px clamp(16px, 4vw, 40px) 28px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
 .cat-card {
     position: relative;
-    height: 260px;
-    border-radius: 18px;
+    height: 220px;
+    border-radius: 16px;
     overflow: hidden;
     cursor: pointer;
     box-shadow: var(--shadow);
@@ -401,7 +429,7 @@ nav a:hover::after {
 }
 
 .cat-card:hover {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
     box-shadow: var(--shadow-3d);
 }
 
@@ -416,27 +444,27 @@ nav a:hover::after {
     right: 0;
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
     color: white;
-    padding: 30px 18px 18px;
+    padding: 24px 14px 14px;
     font-family: 'Playfair Display', serif;
-    font-size: 22px;
+    font-size: 20px;
 }
 
 /* Product Detail */
 .product-detail {
-    padding: 40px 50px;
+    padding: clamp(24px, 4vw, 40px) clamp(16px, 4vw, 40px);
 }
 
 .product-detail-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 50px;
-    max-width: 1100px;
+    gap: 36px;
+    max-width: 1000px;
     margin: 0 auto;
-    align-items: center;
+    align-items: start;
 }
 
 .product-detail-image {
-    border-radius: 20px;
+    border-radius: 18px;
     overflow: hidden;
     box-shadow: var(--shadow-3d);
     transition: 0.5s var(--ease);
@@ -448,7 +476,7 @@ nav a:hover::after {
 
 .product-detail-image img {
     width: 100%;
-    height: 520px;
+    height: 480px;
     object-fit: cover;
     transition: 0.6s var(--ease);
 }
@@ -459,30 +487,113 @@ nav a:hover::after {
 
 .product-detail-info h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 34px;
-    margin-bottom: 10px;
+    font-size: clamp(24px, 4vw, 32px);
+    margin-bottom: 8px;
 }
 
 .product-detail-info .price {
-    font-size: 22px;
+    font-size: 20px;
     color: var(--accent-dark);
     font-weight: 600;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 }
 
 .product-detail-info .desc {
     color: #666;
-    margin-bottom: 26px;
+    margin-bottom: 22px;
     line-height: 1.8;
+}
+
+.detail-desc {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+}
+
+.detail-desc li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.65;
+    margin-bottom: 6px;
+}
+
+.detail-desc li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* Colour options */
+.colour-section {
+    margin-bottom: 20px;
+}
+
+.colour-label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #a88b4a;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.colour-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.colour-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: 0.25s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    position: relative;
+}
+
+.colour-swatch:hover {
+    transform: scale(1.08);
+}
+
+.colour-swatch.active {
+    border-color: var(--accent-dark);
+    box-shadow: 0 0 0 3px rgba(201, 168, 108, 0.35);
+}
+
+.colour-swatch.active::after {
+    content: "✓";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    font-weight: 700;
+}
+
+.colour-name {
+    font-size: 13px;
+    color: #666;
+    margin-top: 6px;
 }
 
 .add-btn-large {
     background: #f5f0e8;
     color: var(--accent-dark);
     border: 1.5px solid var(--accent);
-    padding: 14px 36px;
+    padding: 12px 32px;
     border-radius: 50px;
-    font-size: 15px;
+    font-size: 14px;
     cursor: pointer;
     transition: 0.4s var(--ease);
 }
@@ -490,16 +601,16 @@ nav a:hover::after {
 .add-btn-large:hover {
     background: var(--accent);
     color: white;
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     box-shadow: 0 12px 28px rgba(201, 168, 108, 0.3);
 }
 
 .back-link {
     display: inline-block;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     color: #777;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 13px;
     transition: 0.3s;
 }
 
@@ -509,16 +620,16 @@ nav a:hover::after {
 
 .thumbnails {
     display: flex;
-    gap: 10px;
-    margin-top: 16px;
+    gap: 8px;
+    margin-top: 12px;
     flex-wrap: wrap;
 }
 
 .thumb {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     border: 2px solid transparent;
     transition: 0.3s;
@@ -536,7 +647,7 @@ nav a:hover::after {
     position: fixed;
     top: 0;
     right: -420px;
-    width: 400px;
+    width: min(400px, 100%);
     height: 100%;
     background: white;
     box-shadow: -12px 0 40px rgba(0, 0, 0, 0.1);
@@ -554,14 +665,14 @@ nav a:hover::after {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 22px;
+    padding: 18px;
     border-bottom: 1px solid #eee;
     flex-shrink: 0;
 }
 
 .cart-header h3 {
     font-family: 'Playfair Display', serif;
-    font-size: 22px;
+    font-size: 20px;
 }
 
 .cart-header button {
@@ -574,23 +685,23 @@ nav a:hover::after {
 #cart-items {
     flex: 1;
     overflow-y: auto;
-    padding: 18px;
+    padding: 14px;
     min-height: 0;
 }
 
 .cart-item {
     display: flex;
-    gap: 14px;
-    margin-bottom: 14px;
+    gap: 12px;
+    margin-bottom: 12px;
     align-items: center;
     background: #faf7f2;
-    padding: 12px;
+    padding: 10px;
     border-radius: 12px;
 }
 
 .cart-item img {
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
     object-fit: cover;
     border-radius: 8px;
 }
@@ -600,21 +711,21 @@ nav a:hover::after {
 }
 
 .cart-item-info h4 {
-    font-size: 14px;
-    margin-bottom: 4px;
+    font-size: 13px;
+    margin-bottom: 2px;
 }
 
 .cart-footer {
     flex-shrink: 0;
-    padding: 18px 22px 22px;
+    padding: 16px 18px 20px;
     border-top: 1px solid #eee;
     background: #fff;
 }
 
 .total {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 600;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     text-align: center;
 }
 
@@ -623,12 +734,12 @@ nav a:hover::after {
     background: linear-gradient(135deg, #25D366, #1da851);
     color: white;
     border: none;
-    padding: 14px;
+    padding: 12px;
     border-radius: 12px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     transition: 0.35s;
 }
 
@@ -642,7 +753,7 @@ nav a:hover::after {
     background: #f5f0e8;
     border: 1.5px solid var(--accent);
     color: var(--accent-dark);
-    padding: 11px;
+    padding: 10px;
     border-radius: 12px;
     cursor: pointer;
     transition: 0.3s;
@@ -671,33 +782,31 @@ nav a:hover::after {
     visibility: visible;
 }
 
-/* Announcement — lighter background */
 .announcement {
     background: #5c534a;
     color: #f5ebe0;
     text-align: center;
-    padding: 9px;
-    font-size: 12px;
-    letter-spacing: 0.8px;
+    padding: 8px 12px;
+    font-size: 11px;
+    letter-spacing: 0.6px;
 }
 
-/* Filter buttons — light, not black */
 .filter-btns {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
     justify-content: center;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
 }
 
 .filter-btn {
-    padding: 8px 18px;
+    padding: 7px 16px;
     border: 1.5px solid rgba(201, 168, 108, 0.45);
     background: #f5f0e8;
     color: var(--accent-dark);
     border-radius: 50px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     transition: all 0.3s var(--ease);
 }
@@ -715,63 +824,62 @@ nav a:hover::after {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 14px;
-    margin-bottom: 32px;
+    gap: 12px;
+    margin-bottom: 24px;
 }
 
-/* Why Us */
 .why-us {
-    padding: 50px;
+    padding: clamp(28px, 5vw, 48px) clamp(16px, 4vw, 40px);
     text-align: center;
 }
 
 .why-us h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 32px;
-    margin-bottom: 36px;
+    font-size: clamp(22px, 4vw, 30px);
+    margin-bottom: 28px;
 }
 
 .why-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 28px;
-    max-width: 1000px;
+    gap: 20px;
+    max-width: 960px;
     margin: 0 auto;
 }
 
 .why-item {
     background: white;
-    padding: 28px 22px;
-    border-radius: 16px;
+    padding: 22px 18px;
+    border-radius: 14px;
     box-shadow: var(--shadow);
     transition: 0.4s var(--ease);
 }
 
 .why-item:hover {
-    transform: translateY(-8px);
+    transform: translateY(-6px);
     box-shadow: var(--shadow-3d);
 }
 
 .why-item h4 {
     font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    margin-bottom: 8px;
+    font-size: 16px;
+    margin-bottom: 6px;
     color: var(--accent-dark);
 }
 
 .why-item p {
-    font-size: 14px;
+    font-size: 13px;
     color: #666;
 }
 
 footer {
     text-align: center;
-    padding: 36px;
+    padding: 28px 16px;
     color: #888;
-    font-size: 14px;
+    font-size: 13px;
 }
 
-/* ===== ORDER MODAL — buttons always visible, no extra scroll ===== */
+/* ===== ORDER MODAL ===== */
 .order-modal-overlay {
     position: fixed;
     inset: 0;
@@ -796,7 +904,7 @@ footer {
 .order-modal {
     background: linear-gradient(165deg, #fffefb 0%, #faf7f2 100%);
     border-radius: 20px;
-    padding: 22px 20px 18px;
+    padding: 20px 18px 16px;
     width: 100%;
     max-width: 400px;
     max-height: 90vh;
@@ -815,8 +923,8 @@ footer {
 
 .modal-close {
     position: absolute;
-    top: 12px;
-    right: 14px;
+    top: 10px;
+    right: 12px;
     background: none;
     border: none;
     font-size: 22px;
@@ -832,7 +940,7 @@ footer {
 
 .modal-header {
     text-align: center;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     flex-shrink: 0;
 }
 
@@ -847,7 +955,7 @@ footer {
 
 .order-modal h3 {
     font-family: 'Playfair Display', serif;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
     color: #2c2c2c;
     margin-bottom: 2px;
@@ -863,7 +971,7 @@ footer {
     border: 1px solid rgba(201, 168, 108, 0.22);
     border-radius: 12px;
     padding: 10px 12px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     font-size: 12px;
     color: #444;
     line-height: 1.4;
@@ -885,7 +993,6 @@ footer {
     color: #777;
 }
 
-/* Scrollable fields only — buttons stay fixed at bottom */
 .order-modal-fields {
     overflow-y: auto;
     flex: 1;
@@ -928,11 +1035,10 @@ footer {
 }
 
 .order-modal textarea {
-    min-height: 52px;
+    min-height: 48px;
     resize: vertical;
 }
 
-/* Buttons always at bottom */
 .modal-actions {
     display: flex;
     gap: 10px;
@@ -942,7 +1048,7 @@ footer {
 
 .modal-btn {
     flex: 1;
-    padding: 12px;
+    padding: 11px;
     border-radius: 50px;
     font-family: 'Poppins', sans-serif;
     font-size: 13px;
@@ -961,10 +1067,8 @@ footer {
 .modal-btn.cancel:hover {
     border-color: var(--accent);
     background: #efe8dc;
-    color: var(--accent-dark);
 }
 
-/* Place Order — light style like Add to Bag */
 .modal-btn.confirm {
     background: #f5f0e8;
     border: 1.5px solid var(--accent);
@@ -979,7 +1083,7 @@ footer {
     box-shadow: 0 8px 20px rgba(201, 168, 108, 0.3);
 }
 
-/* ===== Toast — larger, rectangular, prominent + action button ===== */
+/* Toast */
 .toast {
     position: fixed;
     top: 50%;
@@ -987,9 +1091,9 @@ footer {
     transform: translate(-50%, -50%) scale(0.92);
     background: #faf7f2;
     color: #2c2c2c;
-    padding: 22px 28px;
+    padding: 20px 24px;
     border-radius: 16px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     z-index: 3000;
     opacity: 0;
@@ -998,7 +1102,7 @@ footer {
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16);
     border: 1.5px solid rgba(201, 168, 108, 0.35);
     text-align: center;
-    min-width: 280px;
+    min-width: 260px;
     max-width: 92%;
     pointer-events: none;
 }
@@ -1011,13 +1115,13 @@ footer {
 }
 
 .toast-msg {
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     line-height: 1.45;
 }
 
 .toast-actions {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
     flex-wrap: wrap;
 }
@@ -1026,9 +1130,9 @@ footer {
     background: #f5f0e8;
     border: 1.5px solid var(--accent);
     color: var(--accent-dark);
-    padding: 9px 20px;
+    padding: 8px 16px;
     border-radius: 50px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s var(--ease);
@@ -1039,8 +1143,6 @@ footer {
     background: var(--accent);
     color: white;
     border-color: var(--accent);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(201, 168, 108, 0.3);
 }
 
 .toast-btn.secondary {
@@ -1056,37 +1158,78 @@ footer {
 }
 
 /* ===== Responsive ===== */
+@media (max-width: 900px) {
+    .categories {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+    .cat-card {
+        height: 160px;
+    }
+    .cat-card h3 {
+        font-size: 16px;
+        padding: 18px 10px 10px;
+    }
+}
+
 @media (max-width: 768px) {
-    header {
-        padding: 14px 18px;
+    .menu-toggle {
+        display: flex;
+        order: 2;
+        margin-left: auto;
+    }
+
+    .cart-btn {
+        order: 3;
     }
 
     nav {
         display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(250, 247, 242, 0.98);
+        backdrop-filter: blur(12px);
+        flex-direction: column;
+        padding: 12px 16px 16px;
+        border-bottom: 1px solid rgba(201, 168, 108, 0.15);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+        gap: 4px;
+    }
+
+    nav.open {
+        display: flex;
+    }
+
+    nav a {
+        margin: 0;
+        padding: 12px 16px;
+        width: 100%;
+        text-align: center;
+        border-radius: 10px;
+        background: transparent;
+    }
+
+    nav a:hover {
+        background: #f5f0e8;
+    }
+
+    nav a::after {
+        display: none;
     }
 
     .hero {
-        flex-direction: column;
-        padding: 40px 18px;
-        text-align: center;
-        min-height: auto;
-    }
-
-    .hero-content h1 {
-        font-size: 38px;
-    }
-
-    .products-section {
-        padding: 36px 18px;
+        padding: 28px 16px;
     }
 
     .categories {
         grid-template-columns: 1fr;
-        padding: 18px;
+        padding: 12px 16px 20px;
     }
 
-    .why-us {
-        padding: 36px 18px;
+    .cat-card {
+        height: 180px;
     }
 
     .why-grid {
@@ -1095,15 +1238,11 @@ footer {
 
     .product-detail-container {
         grid-template-columns: 1fr;
-        gap: 28px;
-    }
-
-    .product-detail {
-        padding: 28px 18px;
+        gap: 20px;
     }
 
     .product-detail-image img {
-        height: 360px;
+        height: 320px;
     }
 
     .cart-sidebar {
@@ -1112,11 +1251,30 @@ footer {
     }
 
     .product-card:hover {
-        transform: translateY(-8px);
+        transform: translateY(-6px);
     }
 
     .section-header {
         flex-direction: column;
         align-items: center;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 14px;
+    }
+
+    .product-image {
+        height: 200px;
+    }
+}
+
+/* Desktop-site-on-mobile / narrow wide view — reduce empty space */
+@media (min-width: 769px) and (max-height: 700px) {
+    .hero {
+        padding: 28px 32px;
+    }
+    .product-image {
+        height: 220px;
     }
 }
