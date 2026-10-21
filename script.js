@@ -26,8 +26,11 @@ const COLOUR_MAP = {
   orange: "#d4894a",
   yellow: "#e8d48a",
   mauve: "#E0B0FF",
+  "teal blue": "#2e5470",
   teal_blue: "#2e5470",
-  teal: "#3a6b6b"
+  teal: "#3a6b6b",
+  chocolate: "#6b4423",
+  "chocolate brown": "#6b4423"
 };
 
 // ====================== GLOBAL ======================
@@ -115,6 +118,32 @@ function openCartFromToast() {
   }
 }
 
+// ====================== NORMALIZE PRODUCT (API keys) ======================
+function normalizeImages(images) {
+  var str = "";
+  if (Array.isArray(images)) str = images.join(",");
+  else if (typeof images === "string") str = images;
+  else return [];
+  // split on comma OR glued "jpghttps" / "pnghttps"
+  return str
+    .replace(/(https?:\/\/)/gi, "\n$1")
+    .split(/[,\n]+/)
+    .map(function (u) { return u.trim(); })
+    .filter(function (u) { return /^https?:\/\//i.test(u); });
+}
+
+function normalizeProduct(p) {
+  var item = Object.assign({}, p);
+  item.images = normalizeImages(item.images);
+  // API sends oldprice / isnew (lowercase)
+  if (item.oldPrice == null && item.oldprice != null) item.oldPrice = item.oldprice;
+  if (item.isNew == null && item.isnew != null) item.isNew = item.isnew;
+  if (item.id != null && !isNaN(Number(item.id))) item.id = Number(item.id);
+  if (item.price != null && !isNaN(Number(item.price))) item.price = Number(item.price);
+  if (item.oldPrice != null && !isNaN(Number(item.oldPrice))) item.oldPrice = Number(item.oldPrice);
+  return item;
+}
+
 // ====================== LOAD PRODUCTS ======================
 async function loadProducts() {
   const grid = document.getElementById("products-grid");
@@ -123,8 +152,31 @@ async function loadProducts() {
       '<p style="text-align:center;grid-column:1/-1;padding:40px;">Loading products...</p>';
   }
   try {
-    const res = await fetch(PRODUCTS_API);
-    products = await res.json();
+    const res = await fetch(PRODUCTS_API + "?_t=" + Date.now());
+    const data = await res.json();
+
+    if (!Array.isArray(data)) {
+      console.error("Products API error:", data);
+      if (grid) {
+        grid.innerHTML =
+          '<p style="text-align:center;grid-column:1/-1;color:#c45c5c;padding:40px;">Products load nahi ho sake.<br><small>' +
+          ((data && data.error) || "Invalid API response") +
+          "</small></p>";
+      }
+      products = [];
+      return;
+    }
+
+    products = data.map(normalizeProduct);
+
+    if (products.length === 0) {
+      if (grid) {
+        grid.innerHTML =
+          '<p style="text-align:center;grid-column:1/-1;padding:40px;color:#c45c5c;">No products in API ([]).<br><small>Sheet / Apps Script check karein.</small></p>';
+      }
+      return;
+    }
+
     var saved = sessionStorage.getItem("haya_filter");
     if (saved) {
       sessionStorage.removeItem("haya_filter");
@@ -141,7 +193,7 @@ async function loadProducts() {
   }
 }
 
-// ====================== COLOURS HELPER ======================
+// ====================== COLOURS / SIZES HELPERS ======================
 function splitList(raw) {
   if (raw == null || raw === "") return [];
   if (Array.isArray(raw)) {
@@ -154,7 +206,6 @@ function splitList(raw) {
 }
 
 function parseColours(product) {
-  // Direct sheet fields (any casing / naming)
   var raw =
     product.colors ||
     product.colours ||
@@ -168,13 +219,10 @@ function parseColours(product) {
   var list = splitList(raw);
   if (list.length) return list;
 
-  // Fallback: extract from description (e.g. "COLOR : blue , beige")
   var desc = product.desc || product.description || "";
   var m = desc.match(/(?:colors?|colours?)\s*[:\-–—]?\s*([^\n\r.🔥]+)/i);
   if (m && m[1]) {
-    list = splitList(m[1]);
-    // filter out junk words
-    list = list.filter(function (c) {
+    list = splitList(m[1]).filter(function (c) {
       return !/^(available|in|all|and|the|with|for)$/i.test(c);
     });
     if (list.length) return list;
@@ -203,9 +251,15 @@ function parseSizes(product) {
   return [];
 }
 
-
 function isNewProduct(product) {
-  var v = product.isNew != null ? product.isNew : (product.new != null ? product.new : (product.is_new != null ? product.is_new : product.IsNew));
+  var v =
+    product.isNew != null
+      ? product.isNew
+      : product.isnew != null
+      ? product.isnew
+      : product.new != null
+      ? product.new
+      : product.is_new;
   if (v === true || v === 1 || v === "1") return true;
   if (typeof v === "string") {
     var s = v.toLowerCase().trim();
@@ -236,8 +290,10 @@ function selectSize(size, el) {
 }
 
 function colourToHex(name) {
-  var key = String(name).toLowerCase().trim();
+  var key = String(name).toLowerCase().trim().replace(/\s+/g, " ");
   if (COLOUR_MAP[key]) return COLOUR_MAP[key];
+  var key2 = key.replace(/\s+/g, "_");
+  if (COLOUR_MAP[key2]) return COLOUR_MAP[key2];
   if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(key)) return key;
   return "#c9a86c";
 }
@@ -259,7 +315,7 @@ function descToBullets(desc, maxPoints) {
   var points = desc
     .split(/[\n\r]+|•|–|—|\s[-–]\s/)
     .map(function (s) {
-      return s.replace(/^[\s•\-–—*]+/, "").trim();
+      return s.replace(/^[\s•\-–—*🌸✨🤍🎀💫🔥💎🌈]+/, "").trim();
     })
     .filter(function (s) {
       return s.length > 2;
@@ -287,7 +343,7 @@ function descToFullBullets(desc) {
   var points = desc
     .split(/[\n\r]+|•|–|—|\s[-–]\s/)
     .map(function (s) {
-      return s.replace(/^[\s•\-–—*]+/, "").trim();
+      return s.replace(/^[\s•\-–—*🌸✨🤍🎀💫🔥💎🌈]+/, "").trim();
     })
     .filter(function (s) {
       return s.length > 2;
@@ -311,9 +367,11 @@ function displayProducts(filter) {
 
   document.querySelectorAll(".filter-btn").forEach(function (btn) {
     btn.classList.remove("active");
+    var t = btn.textContent.toLowerCase().trim();
     if (
-      btn.textContent.toLowerCase().includes(filter) ||
-      (filter === "all" && btn.textContent === "All")
+      (filter === "all" && t === "all") ||
+      (filter === "new" && t === "new") ||
+      t.includes(filter)
     ) {
       btn.classList.add("active");
     }
@@ -327,13 +385,13 @@ function displayProducts(filter) {
           return isNewProduct(p);
         })
       : products.filter(function (p) {
-          return p.category === filter;
+          return String(p.category || "").toLowerCase() === filter;
         });
 
   grid.innerHTML = "";
   if (filtered.length === 0) {
     grid.innerHTML =
-      '<p style="text-align:center;grid-column:1/-1;">No products found</p>';
+      '<p style="text-align:center;grid-column:1/-1;padding:40px;color:#666;">No products found</p>';
     return;
   }
 
@@ -405,8 +463,14 @@ async function loadProductPage() {
 
   if (products.length === 0) {
     try {
-      const res = await fetch(PRODUCTS_API);
-      products = await res.json();
+      const res = await fetch(PRODUCTS_API + "?_t=" + Date.now());
+      const data = await res.json();
+      if (!Array.isArray(data)) {
+        container.innerHTML =
+          '<p style="text-align:center;">Product load nahi ho saka</p>';
+        return;
+      }
+      products = data.map(normalizeProduct);
     } catch (e) {
       container.innerHTML =
         '<p style="text-align:center;">Product load nahi ho saka</p>';
@@ -419,7 +483,7 @@ async function loadProductPage() {
     10
   );
   const product = products.find(function (p) {
-    return p.id === id;
+    return Number(p.id) === id;
   });
 
   if (!product) {
@@ -446,7 +510,7 @@ async function loadProductPage() {
       '" class="thumb ' +
       (index === 0 ? "active" : "") +
       '" onclick="changeMainImage(\'' +
-      img +
+      img.replace(/'/g, "\\'") +
       "', this)\" alt=\"thumb\">";
   });
 
@@ -459,13 +523,15 @@ async function loadProductPage() {
   const skuLine = skuVal
     ? '<p class="meta-line"><strong>SKU:</strong> ' + skuVal + "</p>"
     : "";
+
   const stockVal = getStock(product);
   let stockHtml = "";
   if (stockVal !== null) {
     if (stockVal <= 0) {
       stockHtml = '<p class="stock-line out">Out of Stock</p>';
     } else if (stockVal <= 5) {
-      stockHtml = '<p class="stock-line low">Only ' + stockVal + ' left in stock</p>';
+      stockHtml =
+        '<p class="stock-line low">Only ' + stockVal + " left in stock</p>";
     } else {
       stockHtml = '<p class="stock-line in">In Stock</p>';
     }
@@ -478,7 +544,8 @@ async function loadProductPage() {
 
   let colourHtml = "";
   if (colours.length > 0) {
-    colourHtml = '<div class="colour-section"><span class="colour-label">Colour</span><div class="colour-options">';
+    colourHtml =
+      '<div class="colour-section"><span class="colour-label">Colour</span><div class="colour-options">';
     colours.forEach(function (c, i) {
       var hex = colourToHex(c);
       var isLight = /white|cream|beige|yellow|pink|rose/i.test(c);
@@ -502,7 +569,8 @@ async function loadProductPage() {
 
   let sizeHtml = "";
   if (sizes.length > 0) {
-    sizeHtml = '<div class="size-section"><span class="colour-label">Size</span><div class="size-options">';
+    sizeHtml =
+      '<div class="size-section"><span class="colour-label">Size</span><div class="size-options">';
     sizes.forEach(function (s, i) {
       sizeHtml +=
         '<button type="button" class="size-btn' +
@@ -522,7 +590,9 @@ async function loadProductPage() {
   var outOfStock = stockVal !== null && stockVal <= 0;
   var addBtn = outOfStock
     ? '<button class="add-btn-large disabled" disabled>Out of Stock</button>'
-    : '<button class="add-btn-large" onclick="addToCart(' + product.id + ')">Add to Cart</button>';
+    : '<button class="add-btn-large" onclick="addToCart(' +
+      product.id +
+      ')">Add to Cart</button>';
 
   container.innerHTML =
     "<div>" +
@@ -556,6 +626,7 @@ async function loadProductPage() {
     addBtn +
     "</div>";
 }
+
 function changeMainImage(src, el) {
   document.getElementById("main-product-image").src = src;
   document.querySelectorAll(".thumb").forEach(function (t) {
@@ -567,7 +638,7 @@ function changeMainImage(src, el) {
 // ====================== CART ======================
 function addToCart(id) {
   const product = products.find(function (p) {
-    return p.id === id;
+    return Number(p.id) === Number(id);
   });
   if (!product) return;
 
@@ -592,7 +663,7 @@ function addToCart(id) {
 
   const existing = cart.find(function (item) {
     return (
-      item.id === id &&
+      Number(item.id) === Number(id) &&
       (item.colour || "") === colour &&
       (item.size || "") === size
     );
@@ -616,7 +687,10 @@ function addToCart(id) {
   var extra = [];
   if (colour) extra.push(colour);
   if (size) extra.push("Size " + size);
-  var msg = product.name + (extra.length ? " (" + extra.join(", ") + ")" : "") + " cart mein add ho gaya ✓";
+  var msg =
+    product.name +
+    (extra.length ? " (" + extra.join(", ") + ")" : "") +
+    " cart mein add ho gaya ✓";
   showToast(msg, true);
 }
 
@@ -687,7 +761,7 @@ function removeFromCartAt(index) {
 
 function removeFromCart(id) {
   cart = cart.filter(function (item) {
-    return item.id !== id;
+    return Number(item.id) !== Number(id);
   });
   saveCart();
   updateCartUI();
@@ -750,7 +824,6 @@ async function submitOrder() {
     return;
   }
 
-  var productsText = "";
   var productsBullets = "";
   cart.forEach(function (item) {
     var line =
@@ -765,7 +838,6 @@ async function submitOrder() {
       item.price +
       " each | Subtotal: Rs." +
       item.price * item.quantity;
-    productsText += line + "\n";
     productsBullets += line + "\n";
   });
 
@@ -805,7 +877,6 @@ async function submitOrder() {
     "*\n\n" +
     "Please confirm. JazakAllah!";
 
-  // Sheet: products as bullet lines (name, qty, unit price, subtotal)
   var sheetUrl =
     ORDERS_API +
     "?name=" +
