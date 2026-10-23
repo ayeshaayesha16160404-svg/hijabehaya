@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
     <title>Product | Hijab-e-Haya</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -11,19 +12,15 @@
     <div class="announcement">
         Flat Rs.300 Shipping on All Orders • No Minimum Purchase
     </div>
-
     <header>
         <button type="button" class="menu-toggle" id="menuToggle" aria-label="Open menu" onclick="toggleMobileMenu()">
             <span></span><span></span><span></span>
         </button>
-
         <div class="logo"><a href="index.html">Hijab-e-Haya<span>.</span></a></div>
-
         <div class="cart-btn" onclick="toggleCart()">
             🛒 <span id="cart-count">0</span>
         </div>
     </header>
-
     <!-- Side Drawer Menu -->
     <div class="drawer-overlay" id="drawerOverlay" onclick="closeMobileMenu()"></div>
     <aside class="side-drawer" id="mainNav">
@@ -42,13 +39,11 @@
             <p>Premium Modest Wear</p>
         </div>
     </aside>
-
     <section class="product-detail">
         <div class="product-detail-container" id="product-detail">
             <!-- JS se load hoga -->
         </div>
     </section>
-
     <!-- Cart -->
     <div class="cart-sidebar" id="cart">
         <div class="cart-header">
@@ -63,9 +58,7 @@
         </div>
     </div>
     <div class="overlay" id="overlay" onclick="toggleCart()"></div>
-
     <script src="script.js"></script>
-
     <!-- ========== ORDER MODAL ========== -->
     <div class="order-modal-overlay" id="orderModal">
         <div class="order-modal">
