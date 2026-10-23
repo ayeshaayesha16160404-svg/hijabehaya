@@ -132,6 +132,26 @@ function normalizeImages(images) {
     .filter(function (u) { return /^https?:\/\//i.test(u); });
 }
 
+
+// Postimg sometimes blocks hotlinks by Referer — no-referrer fixes most cases
+function imgTag(src, extraClass, extraAttrs) {
+  extraClass = extraClass || "";
+  extraAttrs = extraAttrs || "";
+  var s = String(src || "").trim();
+  if (!s) {
+    return '<div class="img-placeholder' + (extraClass ? " " + extraClass : "") + '">No image</div>';
+  }
+  return (
+    '<img src="' +
+    s +
+    '" class="' +
+    extraClass +
+    '" loading="lazy" referrerpolicy="no-referrer" decoding="async" onerror="this.onerror=null;this.classList.add(\'img-broken\');this.alt=\'Image unavailable\';" ' +
+    extraAttrs +
+    " />"
+  );
+}
+
 function normalizeProduct(p) {
   var item = Object.assign({}, p);
   item.images = normalizeImages(item.images);
@@ -426,11 +446,7 @@ function displayProducts(filter) {
       '<div class="product-image">' +
       saleBadge +
       newBadge +
-      '<img src="' +
-      mainImage +
-      '" alt="' +
-      product.name +
-      '" loading="lazy">' +
+      imgTag(mainImage, "", 'alt="' + String(product.name || "").replace(/"/g, "&quot;") + '"') +
       "</div>" +
       '<div class="product-info">' +
       "<h3>" +
@@ -504,14 +520,13 @@ async function loadProductPage() {
 
   let thumbnails = "";
   productImages.forEach(function (img, index) {
-    thumbnails +=
-      '<img src="' +
-      img +
-      '" class="thumb ' +
-      (index === 0 ? "active" : "") +
-      '" onclick="changeMainImage(\'' +
-      img.replace(/'/g, "\\'") +
-      "', this)\" alt=\"thumb\">";
+    thumbnails += imgTag(
+      img,
+      "thumb" + (index === 0 ? " active" : ""),
+      'onclick="changeMainImage(\'' +
+        String(img).replace(/'/g, "\\'") +
+        "', this)" alt="thumb"'
+    );
   });
 
   const descHtml = descToFullBullets(product.desc || "");
@@ -598,11 +613,11 @@ async function loadProductPage() {
     "<div>" +
     '<a href="index.html" class="back-link">← Back to Collection</a>' +
     '<div class="product-detail-image">' +
-    '<img id="main-product-image" src="' +
-    (productImages[0] || "") +
-    '" alt="' +
-    product.name +
-    '">' +
+    imgTag(
+      productImages[0] || "",
+      "",
+      'id="main-product-image" alt="' + String(product.name || "").replace(/"/g, "&quot;") + '"'
+    ) +
     "</div>" +
     '<div class="thumbnails">' +
     thumbnails +
@@ -727,11 +742,7 @@ function updateCartUI() {
 
     cartItems.innerHTML +=
       '<div class="cart-item">' +
-      '<img src="' +
-      img +
-      '" alt="' +
-      item.name +
-      '">' +
+      imgTag(img, "", 'alt="' + String(item.name || "").replace(/"/g, "&quot;") + '"') +
       '<div class="cart-item-info">' +
       '<h4 style="font-size:13px;margin-bottom:2px;">' +
       item.name +
